@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Importar useNavigate
+import Swal from 'sweetalert2'; // Importar SweetAlert2
 import miImagen from "../assets/imagenes/logo_ifemi.jpg";
 import '../assets/css/style.css';
 
@@ -10,8 +11,39 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí puedes agregar lógica de autenticación si quieres
-    navigate('/dashboard'); // Redirige al dashboard
+
+    // Validación de campos vacíos
+    if (username.trim() === "" || password.trim() === "") {
+      Swal.fire({
+        icon: 'error',
+        title: 'Campos incompletos',
+        text: 'Por favor, completa todos los campos.',
+      });
+      return;
+    }
+
+    // Validación adicional (ejemplo: mínimo de caracteres)
+    if (username.length < 5) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Nombre de usuario inválido',
+        text: 'El nombre de usuario debe tener al menos 5 caracteres.',
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Contraseña inválida',
+        text: 'La contraseña debe tener al menos 6 caracteres.',
+      });
+      return;
+    }
+
+    // Si pasa todas las validaciones, navega
+    // Aquí puedes agregar lógica de autenticación
+    navigate('/dashboard');
   };
 
   return (
@@ -38,40 +70,44 @@ const Login = () => {
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Nombre de Usuario */}
-            <div>
+            <div className="relative">
               <label
                 htmlFor="username"
                 className="block mb-1 text-sm font-medium text-gray-600 text-left"
               >
                 Nombre de Usuario
               </label>
-              <input
-                type="text"
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="Tu nombre de usuario"
-              />
+              <div className="flex items-center border border-gray-300 rounded px-3 py-2 focus-within:ring-2 focus-within:ring-blue-400">
+                <i className="bx bxs-user mr-2 text-gray-500"></i>
+                <input
+                  type="text"
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full outline-none"
+                  placeholder="Tu nombre de usuario"
+                />
+              </div>
             </div>
             {/* Contraseña */}
-            <div>
+            <div className="relative">
               <label
                 htmlFor="password"
                 className="block mb-1 text-sm font-medium text-gray-600 text-left"
               >
                 Contraseña
               </label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="Tu contraseña"
-              />
+              <div className="flex items-center border border-gray-300 rounded px-3 py-2 focus-within:ring-2 focus-within:ring-blue-400">
+                <i className="bx bxs-lock mr-2 text-gray-500"></i>
+                <input
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full outline-none"
+                  placeholder="Tu contraseña"
+                />
+              </div>
             </div>
             {/* Botón */}
             <button
