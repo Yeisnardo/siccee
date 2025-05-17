@@ -21,7 +21,8 @@ const Header = () => {
         <span className="material-icons">{menuOpen ? 'close' : 'menu'}</span>
       </button>
       {/* Título */}
-      <h1 className="text-xl font-bold text-white">Mi Aplicación</h1>
+      <h1 className="text-xl font-bold text-white">IFEMI</h1>
+      
     </header>
   );
 };
