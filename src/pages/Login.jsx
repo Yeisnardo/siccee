@@ -1,15 +1,17 @@
-// src/pages/Login.jsx
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Importar useNavigate
 import miImagen from "../assets/imagenes/logo_ifemi.jpg";
-import '../assets/css/style.css'; // Importa los estilos CSS personalizados
+import '../assets/css/style.css';
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate(); // Crear la función de navegación
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`Nombre de Usuario: ${username}\nPassword: ${password}`);
+    // Aquí puedes agregar lógica de autenticación si quieres
+    navigate('/dashboard'); // Redirige al dashboard
   };
 
   return (
