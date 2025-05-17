@@ -1,5 +1,6 @@
 // src/components/Header.jsx
 import { useState } from 'react';
+import Swal from 'sweetalert2'; // Importa SweetAlert2
 import '../assets/css/style.css';
 
 const Header = () => {
@@ -17,6 +18,22 @@ const Header = () => {
 
   const toggleNotifications = () => {
     setNotificationsOpen(!notificationsOpen);
+  };
+
+  const handleCerrarSesion = () => {
+    Swal.fire({
+      title: '¿Estás seguro que quieres cerrar sesión?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, cerrar sesión',
+      cancelButtonText: 'Cancelar',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Aquí puedes agregar la lógica para cerrar sesión
+        Swal.fire('¡Sesión cerrada!', '', 'success');
+        setProfileMenuOpen(false);
+      }
+    });
   };
 
   return (
@@ -96,10 +113,7 @@ const Header = () => {
               </button>
               <button
                 className="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left flex items-center"
-                onClick={() => {
-                  alert('Cerrar sesión');
-                  setProfileMenuOpen(false);
-                }}
+                onClick={handleCerrarSesion}
               >
                 <i className="bx bx-log-out mr-2"></i> Cerrar sesión
               </button>
