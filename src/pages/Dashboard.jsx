@@ -9,6 +9,7 @@ const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(true); // controla si el menu está abierto
 
 
+
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
