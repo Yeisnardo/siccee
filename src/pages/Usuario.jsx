@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../assets/css/style.css";
 import Header from "../components/Header";
 import Menu from "../components/Menu";
+import Swal from "sweetalert2";
 
 const Usuario = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const Usuario = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   // Datos iniciales
   const [data, setData] = useState([
@@ -33,24 +35,53 @@ const Usuario = () => {
     },
   ]);
 
-  // Estados para formulario de nuevo usuario
+  // Estados para crear
+  const [newCedula, setNewCedula] = useState("");
   const [newNombre, setNewNombre] = useState("");
   const [newEmail, setNewEmail] = useState("");
+  const [newUsuario, setNewUsuario] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [newRol, setNewRol] = useState("");
 
-  // Funciones para abrir y cerrar modal
+  // Estado para editar
+  const [editUser, setEditUser] = useState(null);
+
+  // Funciones para abrir/cerrar modal crear
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => {
     setShowModal(false);
-    // Limpiar los campos del formulario
+    setNewCedula("");
     setNewNombre("");
     setNewEmail("");
+    setNewUsuario("");
+    setNewPassword("");
     setNewRol("");
   };
 
-  // Función para agregar nuevo usuario
+  // Funciones para abrir/cerrar modal editar
+  const handleOpenEditModal = (user) => {
+    setEditUser({ ...user });
+    setShowEditModal(true);
+  };
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setEditUser(null);
+  };
+
+  // Agregar usuario
   const handleAddUser = (e) => {
     e.preventDefault();
+    if (
+      !newCedula.trim() ||
+      !newNombre.trim() ||
+      !newEmail.trim() ||
+      !newUsuario.trim() ||
+      !newPassword.trim() ||
+      !newRol
+    ) {
+      Swal.fire("Error", "Por favor, complete todos los campos.", "error");
+      return;
+    }
     const newId = data.length ? Math.max(...data.map((d) => d.id)) + 1 : 1;
     const newUser = {
       id: newId,
@@ -62,7 +93,17 @@ const Usuario = () => {
     handleCloseModal();
   };
 
-  // Filtrar datos
+  // Actualizar usuario
+  const handleUpdateUser = (e) => {
+    e.preventDefault();
+    if (!editUser) return;
+    setData((prev) =>
+      prev.map((u) => (u.id === editUser.id ? { ...editUser } : u))
+    );
+    handleCloseEditModal();
+  };
+
+  // Buscar y ordenar
   const filteredData = data.filter(
     (item) =>
       item.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -70,7 +111,6 @@ const Usuario = () => {
       item.rol.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Ordenar datos
   const sortedData = useMemo(() => {
     if (sortConfig.key) {
       const sorted = [...filteredData].sort((a, b) => {
@@ -96,15 +136,12 @@ const Usuario = () => {
     });
   };
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
+  const toggleMenu = () => setMenuOpen(!menuOpen);
 
   return (
     <div className="flex min-h-screen bg-gray-100 font-sans">
       {menuOpen && <Menu />}
       <div className="flex-1 flex flex-col ml-0 md:ml-64">
-        {/* Header */}
         <Header toggleMenu={toggleMenu} />
 
         {/* Contenido principal */}
@@ -116,12 +153,12 @@ const Usuario = () => {
                 <i className="bx bx-user text-2xl"></i>
               </div>
               <h1 className="text-3xl font-semibold text-gray-800">
-                Gestión de Usuarios
+                Gestión de Usuario
               </h1>
             </div>
           </div>
 
-          {/* Barra de búsqueda y botón */}
+          {/* Barra búsqueda y botón */}
           <div className="mb-6 max-w-4xl mx-auto flex items-center space-x-4">
             {/* Buscador */}
             <div className="relative flex-1">
@@ -132,6 +169,7 @@ const Usuario = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
+              {/* Icono lupa */}
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg
                   className="w-5 h-5 text-gray-400"
@@ -148,7 +186,7 @@ const Usuario = () => {
                 </svg>
               </div>
             </div>
-            {/* Botón para abrir modal */}
+            {/* Botón crear */}
             <button
               className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-full shadow-lg transition"
               onClick={handleOpenModal}
@@ -199,17 +237,43 @@ const Usuario = () => {
                       <td className="px-4 py-3 text-gray-700">{item.email}</td>
                       <td className="px-4 py-3 text-gray-700">{item.rol}</td>
                       <td className="px-4 py-3 flex justify-center space-x-3">
+                        {/* Botón editar */}
                         <button
-                          className="text-blue-600 hover:underline font-semibold"
-                          onClick={() => alert(`Editar usuario ${item.id}`)}
+                          className="text-blue-600 hover:text-blue-800"
+                          onClick={() => handleOpenEditModal(item)}
+                          aria-label="Editar"
                         >
-                          Editar
+                          <i className="bx bx-edit-alt text-xl"></i>
                         </button>
+                        {/* Botón eliminar */}
                         <button
-                          className="text-red-600 hover:underline font-semibold"
-                          onClick={() => alert(`Eliminar usuario ${item.id}`)}
+                          className="text-red-600 hover:text-red-800"
+                          onClick={() => {
+                            Swal.fire({
+                              title: "¿Estás seguro?",
+                              text: `¿Deseas eliminar al usuario ${item.id}?`,
+                              icon: "warning",
+                              showCancelButton: true,
+                              confirmButtonColor: "#d33",
+                              cancelButtonColor: "#3085d6",
+                              confirmButtonText: "Sí, eliminar",
+                              cancelButtonText: "Cancelar",
+                            }).then((result) => {
+                              if (result.isConfirmed) {
+                                setData((prev) =>
+                                  prev.filter((u) => u.id !== item.id)
+                                );
+                                Swal.fire(
+                                  "Eliminado!",
+                                  `El usuario ${item.id} ha sido eliminado.`,
+                                  "success"
+                                );
+                              }
+                            });
+                          }}
+                          aria-label="Eliminar"
                         >
-                          Eliminar
+                          <i className="bx bx-trash text-xl"></i>
                         </button>
                       </td>
                     </tr>
@@ -235,12 +299,15 @@ const Usuario = () => {
         </footer>
       </div>
 
-      {/* Modal para agregar usuario */}
+      {/* Modal crear usuario */}
       {showModal && (
-<div className="fixed inset-0 bg-black-10 bg-opacity backdrop-blur-sm flex items-center justify-center z-50">
-          {/* Contenedor del modal */}
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+          style={{
+            background: "linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.3))",
+          }}
+        >
           <div className="bg-white rounded-lg p-6 max-w-lg w-full relative shadow-lg">
-            {/* Botón para cerrar */}
             <button
               className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
               onClick={handleCloseModal}
@@ -248,31 +315,45 @@ const Usuario = () => {
             >
               ✖
             </button>
-
-            {/* Título del modal */}
             <h2 className="text-xl font-semibold mb-4">
               Agregar Nuevo Usuario
             </h2>
-
-            {/* Formulario */}
-            <form onSubmit={handleAddUser}>
-              {/* Campo Nombre */}
+            {/* Estado para estatus */}
+            {/* Añadimos un estado en la parte superior: */}
+            {/* const [newEstatus, setNewEstatus] = useState("Activo"); */}
+            <form onSubmit={handleAddUser} noValidate>
+              {/* Campos de creación */}
+              <div className="mb-4">
+                <label className="block mb-1 font-medium" htmlFor="cedula">
+                  Cedula de Identidad
+                </label>
+                <input
+                  id="cedula"
+                  className="w-full p-2 border border-gray-300 rounded"
+                  type="text"
+                  placeholder="Cedula de Identidad"
+                  value={newCedula}
+                  onChange={(e) => setNewCedula(e.target.value)}
+                  required
+                  minLength={5}
+                  maxLength={20}
+                />
+              </div>
               <div className="mb-4">
                 <label className="block mb-1 font-medium" htmlFor="nombre">
-                  Nombre
+                  Nombre y Apellido
                 </label>
                 <input
                   id="nombre"
                   className="w-full p-2 border border-gray-300 rounded"
                   type="text"
-                  placeholder="Nombre"
+                  placeholder="Nombre y Apellido"
                   value={newNombre}
                   onChange={(e) => setNewNombre(e.target.value)}
                   required
+                  minLength={3}
                 />
               </div>
-
-              {/* Campo Email */}
               <div className="mb-4">
                 <label className="block mb-1 font-medium" htmlFor="email">
                   Email
@@ -287,8 +368,37 @@ const Usuario = () => {
                   required
                 />
               </div>
-
-              {/* Selección Rol */}
+              <div className="mb-4">
+                <label className="block mb-1 font-medium" htmlFor="usuario">
+                  Nombre de Usuario
+                </label>
+                <input
+                  id="usuario"
+                  className="w-full p-2 border border-gray-300 rounded"
+                  type="text"
+                  placeholder="Nombre de Usuario"
+                  value={newUsuario}
+                  onChange={(e) => setNewUsuario(e.target.value)}
+                  required
+                  minLength={3}
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block mb-1 font-medium" htmlFor="password">
+                  Contraseña
+                </label>
+                <input
+                  id="password"
+                  className="w-full p-2 border border-gray-300 rounded"
+                  type="password"
+                  placeholder="Contraseña"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  minLength={6}
+                />
+              </div>
+              {/* Rol */}
               <div className="mb-4">
                 <label className="block mb-1 font-medium" htmlFor="rol">
                   Rol
@@ -302,11 +412,28 @@ const Usuario = () => {
                 >
                   <option value="">Selecciona un rol</option>
                   <option value="Administrador">Administrador</option>
-                  <option value="Editor">Editor</option>
-                  <option value="Usuario">Usuario</option>
+                  <option value="Credito y Cobranza 1">
+                    Admin. Credito y Cobranza
+                  </option>
+                  <option value="Credito y Cobranza 2">
+                    Asist. Credito y Cobranza
+                  </option>
+                  <option value="Formalizador">Formalizador</option>
                 </select>
               </div>
-
+              {/* Nuevo campo de estatus con valor por defecto "Activo" */}
+              <div className="mb-4">
+                <label className="block mb-1 font-medium" htmlFor="estatus">
+                  Estatus
+                </label>
+                <input
+                  id="estatus"
+                  className="w-full p-2 border border-gray-300 rounded"
+                  type="text"
+                  value="Activo"
+                  disabled
+                />
+              </div>
               {/* Botones */}
               <div className="flex justify-end space-x-2">
                 <button
@@ -324,6 +451,158 @@ const Usuario = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Modal editar usuario */}
+      {showEditModal && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+          style={{
+            background: "linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.3))",
+          }}
+        >
+          <div className="bg-white rounded-lg p-6 max-w-lg w-full relative shadow-lg">
+            <button
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+              onClick={handleCloseEditModal}
+              aria-label="Cerrar"
+            >
+              ✖
+            </button>
+            <h2 className="text-xl font-semibold mb-4">Editar Usuario</h2>
+            {/* Formulario edición */}
+            {editUser && (
+              <form onSubmit={handleUpdateUser} noValidate>
+                {/* Campos edición */}
+                <div className="mb-4">
+                  <label className="block mb-1 font-medium" htmlFor="cedula">
+                    Cedula de Identidad
+                  </label>
+                  <input
+                    id="cedula"
+                    className="w-full p-2 border border-gray-300 rounded"
+                    type="text"
+                    placeholder="Cedula de Identidad"
+                    value={newCedula}
+                    onChange={(e) => setNewCedula(e.target.value)}
+                    required
+                    minLength={5}
+                    maxLength={20}
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block mb-1 font-medium" htmlFor="nombre">
+                    Nombre y Apellido
+                  </label>
+                  <input
+                    id="nombre"
+                    className="w-full p-2 border border-gray-300 rounded"
+                    type="text"
+                    placeholder="Nombre y Apellido"
+                    value={newNombre}
+                    onChange={(e) => setNewNombre(e.target.value)}
+                    required
+                    minLength={3}
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block mb-1 font-medium" htmlFor="email">
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    className="w-full p-2 border border-gray-300 rounded"
+                    type="email"
+                    placeholder="Email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block mb-1 font-medium" htmlFor="usuario">
+                    Nombre de Usuario
+                  </label>
+                  <input
+                    id="usuario"
+                    className="w-full p-2 border border-gray-300 rounded"
+                    type="text"
+                    placeholder="Nombre de Usuario"
+                    value={newUsuario}
+                    onChange={(e) => setNewUsuario(e.target.value)}
+                    required
+                    minLength={3}
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block mb-1 font-medium" htmlFor="password">
+                    Contraseña
+                  </label>
+                  <input
+                    id="password"
+                    className="w-full p-2 border border-gray-300 rounded"
+                    type="password"
+                    placeholder="Contraseña"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    minLength={6}
+                  />
+                </div>
+                {/* Rol */}
+                <div className="mb-4">
+                  <label className="block mb-1 font-medium" htmlFor="rol">
+                    Rol
+                  </label>
+                  <select
+                    id="rol"
+                    className="w-full p-2 border border-gray-300 rounded"
+                    value={newRol}
+                    onChange={(e) => setNewRol(e.target.value)}
+                    required
+                  >
+                    <option value="">Selecciona un rol</option>
+                    <option value="Administrador">Administrador</option>
+                    <option value="Credito y Cobranza 1">
+                      Admin. Credito y Cobranza
+                    </option>
+                    <option value="Credito y Cobranza 2">
+                      Asist. Credito y Cobranza
+                    </option>
+                    <option value="Formalizador">Formalizador</option>
+                  </select>
+                </div>
+                {/* Nuevo campo de estatus con valor por defecto "Activo" */}
+                <div className="mb-4">
+                  <label className="block mb-1 font-medium" htmlFor="estatus">
+                    Estatus
+                  </label>
+                  <input
+                    id="estatus"
+                    className="w-full p-2 border border-gray-300 rounded"
+                    type="text"
+                    value="Activo"
+                    disabled
+                  />
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    type="button"
+                    className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded"
+                    onClick={handleCloseEditModal}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                  >
+                    Guardar Cambios
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

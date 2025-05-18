@@ -45,7 +45,7 @@ const Menu = ({ onClose }) => {
           }
           onClick={onClose}
         >
-          <i className='bx bx-line-chart mr-3 text-xl'></i>
+          <i className='bx bx-user mr-3 text-xl'></i>
           <span>Gestión de Usuarios</span>
         </NavLink>
 
@@ -74,7 +74,7 @@ const Menu = ({ onClose }) => {
           onClick={onClose}
         >
           <i className='bx bx-check-circle mr-3 text-xl'></i>
-          <span>Aprobación de Solicitud</span>
+          <span>Aprobación de Solicitud de Credito</span>
         </NavLink>
 
         {/* Gestión de Crédito */}
