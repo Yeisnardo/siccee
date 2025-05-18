@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../assets/css/style.css";
 import Header from "../components/Header";
 import Menu from "../components/Menu";
+import Swal from 'sweetalert2';
 
 const Usuario = () => {
   const navigate = useNavigate();
@@ -199,18 +200,44 @@ const Usuario = () => {
                       <td className="px-4 py-3 text-gray-700">{item.email}</td>
                       <td className="px-4 py-3 text-gray-700">{item.rol}</td>
                       <td className="px-4 py-3 flex justify-center space-x-3">
-                        <button
-                          className="text-blue-600 hover:underline font-semibold"
-                          onClick={() => alert(`Editar usuario ${item.id}`)}
-                        >
-                          Editar
-                        </button>
-                        <button
-                          className="text-red-600 hover:underline font-semibold"
-                          onClick={() => alert(`Eliminar usuario ${item.id}`)}
-                        >
-                          Eliminar
-                        </button>
+                     {/* Ícono de editar */}
+
+<button
+  className="text-blue-600 hover:text-blue-800"
+  onClick={() => alert(`Editar usuario ${item.id}`)}
+  aria-label="Editar"
+>
+  <i className='bx bx-edit-alt text-xl'></i>
+</button>
+
+{/* Botón de eliminar con SweetAlert2 */}
+<button
+  className="text-red-600 hover:text-red-800"
+  onClick={() => {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: `¿Deseas eliminar al usuario ${item.id}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Aquí puedes agregar la lógica para eliminar el usuario
+        Swal.fire(
+          'Eliminado!',
+          `El usuario ${item.id} ha sido eliminado.`,
+          'success'
+        );
+      }
+    });
+  }}
+  aria-label="Eliminar"
+>
+  <i className='bx bx-trash text-xl'></i>
+</button>
                       </td>
                     </tr>
                   ))
@@ -237,7 +264,12 @@ const Usuario = () => {
 
       {/* Modal para agregar usuario */}
       {showModal && (
-<div className="fixed inset-0 bg-black-10 bg-opacity backdrop-blur-sm flex items-center justify-center z-50">
+<div
+    className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+    style={{
+      background: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3))'
+    }}
+  >
           {/* Contenedor del modal */}
           <div className="bg-white rounded-lg p-6 max-w-lg w-full relative shadow-lg">
             {/* Botón para cerrar */}
