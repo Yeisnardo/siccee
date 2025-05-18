@@ -23,7 +23,7 @@ const Menu = ({ onClose }) => {
 
         {/* Perfil Financiero */}
         <NavLink
-          to="/perfil"
+          to="/Perfil"
           className={({ isActive }) =>
             `flex items-center text-gray-700 hover:bg-gray-200 p-2 rounded transition-colors duration-200 ${
               isActive ? activeClassName : ""
@@ -35,9 +35,9 @@ const Menu = ({ onClose }) => {
           <span>Perfil Financiero</span>
         </NavLink>
 
-        {/* Estadísticas */}
+        {/* Usuarios */}
         <NavLink
-          to="/estadisticas"
+          to="/Usuario"
           className={({ isActive }) =>
             `flex items-center text-gray-700 hover:bg-gray-200 p-2 rounded transition-colors duration-200 ${
               isActive ? activeClassName : ""
@@ -49,9 +49,9 @@ const Menu = ({ onClose }) => {
           <span>Gestión de Usuarios</span>
         </NavLink>
 
-        {/* Configuración */}
+        {/* Gestion de Emprendedor */}
         <NavLink
-          to="/config"
+          to="/Emprendedor"
           className={({ isActive }) =>
             `flex items-center text-gray-700 hover:bg-gray-200 p-2 rounded transition-colors duration-200 ${
               isActive ? activeClassName : ""
@@ -59,13 +59,13 @@ const Menu = ({ onClose }) => {
           }
           onClick={onClose}
         >
-          <i className='bx bx-user mr-3 text-xl'></i>
+          <i className='bx bx-group mr-3 text-xl'></i>
           <span>Gestión de Emprendedor</span>
         </NavLink>
 
         {/* Aprobación de Solicitud */}
         <NavLink
-          to="/aprobacion"
+          to="/Aprobacion"
           className={({ isActive }) =>
             `flex items-center text-gray-700 hover:bg-gray-200 p-2 rounded transition-colors duration-200 ${
               isActive ? activeClassName : ""
@@ -79,7 +79,7 @@ const Menu = ({ onClose }) => {
 
         {/* Gestión de Crédito */}
         <NavLink
-          to="/credito"
+          to="/Gestion"
           className={({ isActive }) =>
             `flex items-center text-gray-700 hover:bg-gray-200 p-2 rounded transition-colors duration-200 ${
               isActive ? activeClassName : ""
