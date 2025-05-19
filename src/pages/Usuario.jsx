@@ -3,39 +3,30 @@ import { useNavigate } from "react-router-dom";
 import "../assets/css/style.css";
 import Header from "../components/Header";
 import Menu from "../components/Menu";
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2';
 
 const Usuario = () => {
   const navigate = useNavigate();
+
+  // Estado para gestionar el menú lateral
   const [menuOpen, setMenuOpen] = useState(true);
+
+  // Estado para búsqueda y ordenamiento
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+
+  // Estados para manejar los modales
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  // Datos iniciales
+  // Datos iniciales de usuarios
   const [data, setData] = useState([
-    {
-      id: 1,
-      nombre: "Juan Pérez",
-      email: "juan.perez@example.com",
-      rol: "Administrador",
-    },
-    {
-      id: 2,
-      nombre: "María Gómez",
-      email: "maria.gomez@example.com",
-      rol: "Editor",
-    },
-    {
-      id: 3,
-      nombre: "Carlos López",
-      email: "carlos.lopez@example.com",
-      rol: "Usuario",
-    },
+    { id: 1, nombre: "Juan Pérez", email: "juan.perez@example.com", rol: "Administrador" },
+    { id: 2, nombre: "María Gómez", email: "maria.gomez@example.com", rol: "Editor" },
+    { id: 3, nombre: "Carlos López", email: "carlos.lopez@example.com", rol: "Usuario" },
   ]);
 
-  // Estados para crear
+  // Estados para crear nuevo usuario
   const [newCedula, setNewCedula] = useState("");
   const [newNombre, setNewNombre] = useState("");
   const [newEmail, setNewEmail] = useState("");
@@ -43,13 +34,14 @@ const Usuario = () => {
   const [newPassword, setNewPassword] = useState("");
   const [newRol, setNewRol] = useState("");
 
-  // Estado para editar
+  // Estado para editar usuario
   const [editUser, setEditUser] = useState(null);
 
-  // Funciones para abrir/cerrar modal crear
+  // Funciones para gestionar los modales
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => {
     setShowModal(false);
+    // Limpiar campos
     setNewCedula("");
     setNewNombre("");
     setNewEmail("");
@@ -58,7 +50,6 @@ const Usuario = () => {
     setNewRol("");
   };
 
-  // Funciones para abrir/cerrar modal editar
   const handleOpenEditModal = (user) => {
     setEditUser({ ...user });
     setShowEditModal(true);
@@ -68,7 +59,7 @@ const Usuario = () => {
     setEditUser(null);
   };
 
-  // Agregar usuario
+  // Función para agregar usuario
   const handleAddUser = (e) => {
     e.preventDefault();
     if (
@@ -93,7 +84,7 @@ const Usuario = () => {
     handleCloseModal();
   };
 
-  // Actualizar usuario
+  // Función para actualizar usuario
   const handleUpdateUser = (e) => {
     e.preventDefault();
     if (!editUser) return;
@@ -103,7 +94,7 @@ const Usuario = () => {
     handleCloseEditModal();
   };
 
-  // Buscar y ordenar
+  // Filtrar y ordenar datos
   const filteredData = data.filter(
     (item) =>
       item.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -130,7 +121,10 @@ const Usuario = () => {
   const handleSort = (key) => {
     setSortConfig((prev) => {
       if (prev.key === key) {
-        return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
+        return {
+          key,
+          direction: prev.direction === "asc" ? "desc" : "asc",
+        };
       }
       return { key, direction: "asc" };
     });
@@ -230,60 +224,53 @@ const Usuario = () => {
                 {sortedData.length > 0 ? (
                   sortedData.map((item) => (
                     <tr key={item.id} className="transition hover:bg-gray-100">
-                      <td className="px-4 py-3 text-center text-gray-600">
-                        {item.id}
-                      </td>
+                      <td className="px-4 py-3 text-center text-gray-600">{item.id}</td>
                       <td className="px-4 py-3 text-gray-700">{item.nombre}</td>
                       <td className="px-4 py-3 text-gray-700">{item.email}</td>
                       <td className="px-4 py-3 text-gray-700">{item.rol}</td>
                       <td className="px-4 py-3 flex justify-center space-x-3">
-                        {/* Botón editar */}
+                        {/* Ícono y acción editar */}
                         <button
                           className="text-blue-600 hover:text-blue-800"
                           onClick={() => handleOpenEditModal(item)}
                           aria-label="Editar"
                         >
-                          <i className="bx bx-edit-alt text-xl"></i>
+                          <i className='bx bx-edit-alt text-xl'></i>
                         </button>
-                        {/* Botón eliminar */}
+                        {/* Botón eliminar con Swal */}
                         <button
                           className="text-red-600 hover:text-red-800"
                           onClick={() => {
                             Swal.fire({
-                              title: "¿Estás seguro?",
+                              title: '¿Estás seguro?',
                               text: `¿Deseas eliminar al usuario ${item.id}?`,
-                              icon: "warning",
+                              icon: 'warning',
                               showCancelButton: true,
-                              confirmButtonColor: "#d33",
-                              cancelButtonColor: "#3085d6",
-                              confirmButtonText: "Sí, eliminar",
-                              cancelButtonText: "Cancelar",
+                              confirmButtonColor: '#d33',
+                              cancelButtonColor: '#3085d6',
+                              confirmButtonText: 'Sí, eliminar',
+                              cancelButtonText: 'Cancelar'
                             }).then((result) => {
                               if (result.isConfirmed) {
-                                setData((prev) =>
-                                  prev.filter((u) => u.id !== item.id)
-                                );
+                                setData((prev) => prev.filter((u) => u.id !== item.id));
                                 Swal.fire(
-                                  "Eliminado!",
+                                  'Eliminado!',
                                   `El usuario ${item.id} ha sido eliminado.`,
-                                  "success"
+                                  'success'
                                 );
                               }
                             });
                           }}
                           aria-label="Eliminar"
                         >
-                          <i className="bx bx-trash text-xl"></i>
+                          <i className='bx bx-trash text-xl'></i>
                         </button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td
-                      colSpan={5}
-                      className="text-center py-4 text-gray-500 font-semibold"
-                    >
+                    <td colSpan={5} className="text-center py-4 text-gray-500 font-semibold">
                       No se encontraron resultados.
                     </td>
                   </tr>
@@ -304,10 +291,12 @@ const Usuario = () => {
         <div
           className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
           style={{
-            background: "linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.3))",
+            background: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3))'
           }}
         >
+          {/* Contenedor del modal */}
           <div className="bg-white rounded-lg p-6 max-w-lg w-full relative shadow-lg">
+            {/* Botón cerrar */}
             <button
               className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
               onClick={handleCloseModal}
@@ -315,14 +304,10 @@ const Usuario = () => {
             >
               ✖
             </button>
-            <h2 className="text-xl font-semibold mb-4">
-              Agregar Nuevo Usuario
-            </h2>
-            {/* Estado para estatus */}
-            {/* Añadimos un estado en la parte superior: */}
-            {/* const [newEstatus, setNewEstatus] = useState("Activo"); */}
+            <h2 className="text-xl font-semibold mb-4">Agregar Nuevo Usuario</h2>
+            {/* Formulario creación */}
             <form onSubmit={handleAddUser} noValidate>
-              {/* Campos de creación */}
+              {/* Campos */}
               <div className="mb-4">
                 <label className="block mb-1 font-medium" htmlFor="cedula">
                   Cedula de Identidad
@@ -412,16 +397,12 @@ const Usuario = () => {
                 >
                   <option value="">Selecciona un rol</option>
                   <option value="Administrador">Administrador</option>
-                  <option value="Credito y Cobranza 1">
-                    Admin. Credito y Cobranza
-                  </option>
-                  <option value="Credito y Cobranza 2">
-                    Asist. Credito y Cobranza
-                  </option>
+                  <option value="Credito y Cobranza 1">Admin. Credito y Cobranza</option>
+                  <option value="Credito y Cobranza 2">Asist. Credito y Cobranza</option>
                   <option value="Formalizador">Formalizador</option>
                 </select>
               </div>
-              {/* Nuevo campo de estatus con valor por defecto "Activo" */}
+              {/* Estatus (valor fijo "Activo") */}
               <div className="mb-4">
                 <label className="block mb-1 font-medium" htmlFor="estatus">
                   Estatus
@@ -434,7 +415,7 @@ const Usuario = () => {
                   disabled
                 />
               </div>
-              {/* Botones */}
+              {/* Acciones */}
               <div className="flex justify-end space-x-2">
                 <button
                   type="button"
@@ -454,15 +435,17 @@ const Usuario = () => {
           </div>
         </div>
       )}
+
       {/* Modal editar usuario */}
       {showEditModal && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
           style={{
-            background: "linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.3))",
+            background: 'linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.3))'
           }}
         >
           <div className="bg-white rounded-lg p-6 max-w-lg w-full relative shadow-lg">
+            {/* Botón cerrar */}
             <button
               className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
               onClick={handleCloseEditModal}
@@ -484,8 +467,10 @@ const Usuario = () => {
                     className="w-full p-2 border border-gray-300 rounded"
                     type="text"
                     placeholder="Cedula de Identidad"
-                    value={newCedula}
-                    onChange={(e) => setNewCedula(e.target.value)}
+                    value={editUser.cedula}
+                    onChange={(e) =>
+                      setEditUser({ ...editUser, cedula: e.target.value })
+                    }
                     required
                     minLength={5}
                     maxLength={20}
@@ -500,12 +485,17 @@ const Usuario = () => {
                     className="w-full p-2 border border-gray-300 rounded"
                     type="text"
                     placeholder="Nombre y Apellido"
-                    value={newNombre}
-                    onChange={(e) => setNewNombre(e.target.value)}
+                    value={editUser.nombre}
+                    onChange={(e) =>
+                      setEditUser({ ...editUser, nombre: e.target.value })
+                    }
                     required
                     minLength={3}
                   />
                 </div>
+                {/* Otros campos similares */}
+
+                {/* Email */}
                 <div className="mb-4">
                   <label className="block mb-1 font-medium" htmlFor="email">
                     Email
@@ -515,11 +505,14 @@ const Usuario = () => {
                     className="w-full p-2 border border-gray-300 rounded"
                     type="email"
                     placeholder="Email"
-                    value={newEmail}
-                    onChange={(e) => setNewEmail(e.target.value)}
+                    value={editUser.email}
+                    onChange={(e) =>
+                      setEditUser({ ...editUser, email: e.target.value })
+                    }
                     required
                   />
                 </div>
+                {/* Usuario */}
                 <div className="mb-4">
                   <label className="block mb-1 font-medium" htmlFor="usuario">
                     Nombre de Usuario
@@ -529,12 +522,15 @@ const Usuario = () => {
                     className="w-full p-2 border border-gray-300 rounded"
                     type="text"
                     placeholder="Nombre de Usuario"
-                    value={newUsuario}
-                    onChange={(e) => setNewUsuario(e.target.value)}
+                    value={editUser.usuario}
+                    onChange={(e) =>
+                      setEditUser({ ...editUser, usuario: e.target.value })
+                    }
                     required
                     minLength={3}
                   />
                 </div>
+                {/* Contraseña */}
                 <div className="mb-4">
                   <label className="block mb-1 font-medium" htmlFor="password">
                     Contraseña
@@ -544,8 +540,10 @@ const Usuario = () => {
                     className="w-full p-2 border border-gray-300 rounded"
                     type="password"
                     placeholder="Contraseña"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
+                    value={editUser.password}
+                    onChange={(e) =>
+                      setEditUser({ ...editUser, password: e.target.value })
+                    }
                     required
                     minLength={6}
                   />
@@ -558,22 +556,20 @@ const Usuario = () => {
                   <select
                     id="rol"
                     className="w-full p-2 border border-gray-300 rounded"
-                    value={newRol}
-                    onChange={(e) => setNewRol(e.target.value)}
+                    value={editUser.rol}
+                    onChange={(e) =>
+                      setEditUser({ ...editUser, rol: e.target.value })
+                    }
                     required
                   >
                     <option value="">Selecciona un rol</option>
                     <option value="Administrador">Administrador</option>
-                    <option value="Credito y Cobranza 1">
-                      Admin. Credito y Cobranza
-                    </option>
-                    <option value="Credito y Cobranza 2">
-                      Asist. Credito y Cobranza
-                    </option>
+                    <option value="Credito y Cobranza 1">Admin. Credito y Cobranza</option>
+                    <option value="Credito y Cobranza 2">Asist. Credito y Cobranza</option>
                     <option value="Formalizador">Formalizador</option>
                   </select>
                 </div>
-                {/* Nuevo campo de estatus con valor por defecto "Activo" */}
+                {/* Estatus (valor fijo) */}
                 <div className="mb-4">
                   <label className="block mb-1 font-medium" htmlFor="estatus">
                     Estatus
@@ -586,6 +582,7 @@ const Usuario = () => {
                     disabled
                   />
                 </div>
+                {/* Acciones */}
                 <div className="flex justify-end space-x-2">
                   <button
                     type="button"
