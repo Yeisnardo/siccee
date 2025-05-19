@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../assets/css/style.css";
 import Header from "../components/Header";
 import Menu from "../components/Menu";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 const Usuario = () => {
   const navigate = useNavigate();
@@ -21,9 +21,24 @@ const Usuario = () => {
 
   // Datos iniciales de usuarios
   const [data, setData] = useState([
-    { id: 1, nombre: "Juan Pérez", email: "juan.perez@example.com", rol: "Administrador" },
-    { id: 2, nombre: "María Gómez", email: "maria.gomez@example.com", rol: "Editor" },
-    { id: 3, nombre: "Carlos López", email: "carlos.lopez@example.com", rol: "Usuario" },
+    {
+      id: 1,
+      nombre: "Juan Pérez",
+      email: "juan.perez@example.com",
+      rol: "Administrador",
+    },
+    {
+      id: 2,
+      nombre: "María Gómez",
+      email: "maria.gomez@example.com",
+      rol: "Editor",
+    },
+    {
+      id: 3,
+      nombre: "Carlos López",
+      email: "carlos.lopez@example.com",
+      rol: "Usuario",
+    },
   ]);
 
   // Estados para crear nuevo usuario
@@ -224,7 +239,9 @@ const Usuario = () => {
                 {sortedData.length > 0 ? (
                   sortedData.map((item) => (
                     <tr key={item.id} className="transition hover:bg-gray-100">
-                      <td className="px-4 py-3 text-center text-gray-600">{item.id}</td>
+                      <td className="px-4 py-3 text-center text-gray-600">
+                        {item.id}
+                      </td>
                       <td className="px-4 py-3 text-gray-700">{item.nombre}</td>
                       <td className="px-4 py-3 text-gray-700">{item.email}</td>
                       <td className="px-4 py-3 text-gray-700">{item.rol}</td>
@@ -235,42 +252,47 @@ const Usuario = () => {
                           onClick={() => handleOpenEditModal(item)}
                           aria-label="Editar"
                         >
-                          <i className='bx bx-edit-alt text-xl'></i>
+                          <i className="bx bx-edit-alt text-xl"></i>
                         </button>
                         {/* Botón eliminar con Swal */}
                         <button
                           className="text-red-600 hover:text-red-800"
                           onClick={() => {
                             Swal.fire({
-                              title: '¿Estás seguro?',
+                              title: "¿Estás seguro?",
                               text: `¿Deseas eliminar al usuario ${item.id}?`,
-                              icon: 'warning',
+                              icon: "warning",
                               showCancelButton: true,
-                              confirmButtonColor: '#d33',
-                              cancelButtonColor: '#3085d6',
-                              confirmButtonText: 'Sí, eliminar',
-                              cancelButtonText: 'Cancelar'
+                              confirmButtonColor: "#d33",
+                              cancelButtonColor: "#3085d6",
+                              confirmButtonText: "Sí, eliminar",
+                              cancelButtonText: "Cancelar",
                             }).then((result) => {
                               if (result.isConfirmed) {
-                                setData((prev) => prev.filter((u) => u.id !== item.id));
+                                setData((prev) =>
+                                  prev.filter((u) => u.id !== item.id)
+                                );
                                 Swal.fire(
-                                  'Eliminado!',
+                                  "Eliminado!",
                                   `El usuario ${item.id} ha sido eliminado.`,
-                                  'success'
+                                  "success"
                                 );
                               }
                             });
                           }}
                           aria-label="Eliminar"
                         >
-                          <i className='bx bx-trash text-xl'></i>
+                          <i className="bx bx-trash text-xl"></i>
                         </button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="text-center py-4 text-gray-500 font-semibold">
+                    <td
+                      colSpan={5}
+                      className="text-center py-4 text-gray-500 font-semibold"
+                    >
                       No se encontraron resultados.
                     </td>
                   </tr>
@@ -291,11 +313,12 @@ const Usuario = () => {
         <div
           className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
           style={{
-            background: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3))'
+            background:
+              "linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3))",
           }}
         >
-          {/* Contenedor del modal */}
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full relative shadow-lg">
+          {/* Contenedor del modal con tamaño reducido y desplazamiento */}
+          <div className="bg-white rounded-lg p-4 max-w-lg w-full h-[70vh] overflow-y-auto relative shadow-lg">
             {/* Botón cerrar */}
             <button
               className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
@@ -304,7 +327,9 @@ const Usuario = () => {
             >
               ✖
             </button>
-            <h2 className="text-xl font-semibold mb-4">Agregar Nuevo Usuario</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              Agregar Nuevo Usuario
+            </h2>
             {/* Formulario creación */}
             <form onSubmit={handleAddUser} noValidate>
               {/* Campos */}
@@ -397,9 +422,12 @@ const Usuario = () => {
                 >
                   <option value="">Selecciona un rol</option>
                   <option value="Administrador">Administrador</option>
-                  <option value="Credito y Cobranza 1">Admin. Credito y Cobranza</option>
-                  <option value="Credito y Cobranza 2">Asist. Credito y Cobranza</option>
-                  <option value="Formalizador">Formalizador</option>
+                  <option value="Credito y Cobranza 1">
+                    Admin. Credito y Cobranza
+                  </option>
+                  <option value="Credito y Cobranza 2">
+                    Asist. Credito y Cobranza
+                  </option>
                 </select>
               </div>
               {/* Estatus (valor fijo "Activo") */}
@@ -441,10 +469,10 @@ const Usuario = () => {
         <div
           className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
           style={{
-            background: 'linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.3))'
+            background: "linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.3))",
           }}
         >
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full relative shadow-lg">
+          <div className="bg-white rounded-lg p-4 max-w-lg w-full h-[70vh] overflow-y-auto relative shadow-lg">
             {/* Botón cerrar */}
             <button
               className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
@@ -564,8 +592,12 @@ const Usuario = () => {
                   >
                     <option value="">Selecciona un rol</option>
                     <option value="Administrador">Administrador</option>
-                    <option value="Credito y Cobranza 1">Admin. Credito y Cobranza</option>
-                    <option value="Credito y Cobranza 2">Asist. Credito y Cobranza</option>
+                    <option value="Credito y Cobranza 1">
+                      Admin. Credito y Cobranza
+                    </option>
+                    <option value="Credito y Cobranza 2">
+                      Asist. Credito y Cobranza
+                    </option>
                     <option value="Formalizador">Formalizador</option>
                   </select>
                 </div>

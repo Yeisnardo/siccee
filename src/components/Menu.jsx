@@ -74,7 +74,7 @@ const Menu = ({ onClose }) => {
           onClick={onClose}
         >
           <i className="bx bx-credit-card mr-3 text-xl"></i>
-          <span>Gestión de Crédito</span>
+          <span>Gestor de Crédito</span>
         </NavLink>
 
         {/* Gestión de Amortización */}
