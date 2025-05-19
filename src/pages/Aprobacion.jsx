@@ -35,8 +35,10 @@ const Aprobacion = () => {
   const [solicitudes, setSolicitudes] = useState(solicitudesEjemplo);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [solicitudSeleccionada, setSolicitudSeleccionada] = useState(null);
-  const [mensajeExito, setMensajeExito] = useState(""); // para mostrar mensaje de éxito
+  const [mensajeExito, setMensajeExito] = useState("");
   const [contadorSecuencial, setContadorSecuencial] = useState(1);
+  const [busqueda, setBusqueda] = useState("");
+
   const añoActual = new Date().getFullYear().toString().slice(-2);
 
   // Efecto para ocultar el mensaje de éxito en 2 segundos
@@ -62,13 +64,11 @@ const Aprobacion = () => {
     setMostrarModal(false);
   };
 
-  // Cuando el usuario hace clic en "Aprobar" desde la lista, solo abre el modal
   const handleAprobarDesdeLista = (s) => {
     setSolicitudSeleccionada(s);
     setMostrarModal(true);
   };
 
-  // Cuando el usuario hace clic en "Aprobar y asignar contrato" en el modal
   const handleAprobar = () => {
     if (solicitudSeleccionada) {
       const numeroSecuencial = String(contadorSecuencial).padStart(3, "0");
@@ -82,16 +82,17 @@ const Aprobacion = () => {
         )
       );
       setContadorSecuencial((prev) => prev + 1);
-
-      // Mostrar mensaje de éxito
       setMensajeExito(
         `¡Solicitud aprobada! Número de contrato: ${contratoNumero}`
       );
-
-      // Cerrar el modal inmediatamente después de aprobar
       handleCerrarModal();
     }
   };
+
+  // Filtrar solicitudes según la búsqueda
+  const solicitudesFiltradas = solicitudes.filter((s) =>
+    s.solicitante.toLowerCase().includes(busqueda.toLowerCase())
+  );
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -101,7 +102,8 @@ const Aprobacion = () => {
         <Header toggleMenu={toggleMenu} />
 
         <div className="pt-20 px-8">
-          {/* Mostrar mensaje de éxito que desaparece en 2 segundos */}
+
+          {/* Mostrar mensaje de éxito */}
           {mensajeExito && (
             <div className="mb-4 p-3 bg-green-200 text-green-800 rounded">
               {mensajeExito}
@@ -119,18 +121,42 @@ const Aprobacion = () => {
             </div>
           </header>
 
+                    {/* Buscador */}
+          <div className="mb-6 max-w-4xl mx-auto flex flex-col items-start space-y-2">
+            <label
+              htmlFor="buscarSolicitante"
+              className="text-gray-700 font-semibold"
+            >
+              Buscar Solicitante
+            </label>
+            <div className="w-full flex items-center space-x-4">
+              <input
+                id="buscarSolicitante"
+                type="text"
+                placeholder="Buscar..."
+                className="w-full p-3 pl-10 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Lista de solicitudes */}
           <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {solicitudes.map((s) => (
+            {solicitudesFiltradas.map((s) => (
               <div
                 key={s.id}
-                className="bg-white-500 p-4 rounded-xl shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl"
+                className="bg-white p-4 rounded-xl shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl"
               >
                 <h2 className="text-xl font-semibold mb-2">{s.solicitante}</h2>
                 <p className="mb-2">
                   <strong>Contrato:</strong>{" "}
                   {s.contrato ? s.contrato : "Pendiente"}
                 </p>
-                <p className="mb-2">
+                {/* Estado con color condicional */}
+                <p className={`mb-2 font-semibold ${
+                  s.estado === "Pendiente" ? "text-red-600" : "text-green-600"
+                }`}>
                   <strong>Estado:</strong> {s.estado}
                 </p>
                 <div className="flex justify-end space-x-2 mt-4">
@@ -154,6 +180,7 @@ const Aprobacion = () => {
           </section>
         </div>
 
+        {/* Modal detalles y aprobación */}
         {mostrarModal && solicitudSeleccionada && (
           <div
             className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
@@ -186,7 +213,16 @@ const Aprobacion = () => {
                   : "Pendiente"}
               </p>
               <p>
-                <strong>Estado:</strong> {solicitudSeleccionada.estado}
+                <strong>Estado:</strong>{" "}
+                <span
+                  className={`font-semibold ${
+                    solicitudSeleccionada.estado === "Pendiente"
+                      ? "text-red-600"
+                      : "text-green-600"
+                  }`}
+                >
+                  {solicitudSeleccionada.estado}
+                </span>
               </p>
               <div className="mt-4 flex justify-end space-x-2">
                 <button
@@ -195,13 +231,15 @@ const Aprobacion = () => {
                 >
                   Cancelar
                 </button>
-                {/* Botón para aprobar en el modal */}
-                <button
-                  className="bg-green-600 text-white px-4 py-2 rounded"
-                  onClick={handleAprobar}
-                >
-                  Aprobar y asignar contrato
-                </button>
+                {/* Botón en modal */}
+                {solicitudSeleccionada.estado !== "Aprobado" && (
+                  <button
+                    className="bg-green-600 text-white px-4 py-2 rounded"
+                    onClick={handleAprobar}
+                  >
+                    Aprobar y asignar contrato
+                  </button>
+                )}
               </div>
             </div>
           </div>

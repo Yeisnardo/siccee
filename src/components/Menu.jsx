@@ -17,22 +17,8 @@ const Menu = ({ onClose }) => {
           }
           onClick={onClose}
         >
-          <i className='bx bx-home mr-3 text-xl'></i>
+          <i className="bx bx-home mr-3 text-xl"></i>
           <span>Inicio</span>
-        </NavLink>
-
-        {/* Perfil Financiero */}
-        <NavLink
-          to="/Perfil"
-          className={({ isActive }) =>
-            `flex items-center text-gray-700 hover:bg-gray-200 p-2 rounded transition-colors duration-200 ${
-              isActive ? activeClassName : ""
-            }`
-          }
-          onClick={onClose}
-        >
-          <i className='bx bx-user mr-3 text-xl'></i>
-          <span>Perfil Financiero</span>
         </NavLink>
 
         {/* Usuarios */}
@@ -45,13 +31,13 @@ const Menu = ({ onClose }) => {
           }
           onClick={onClose}
         >
-          <i className='bx bx-user mr-3 text-xl'></i>
+          <i className="bx bx-user mr-3 text-xl"></i>
           <span>Gestión de Usuarios</span>
         </NavLink>
 
-        {/* Gestion de Emprendedor */}
+        {/* Perfil Financiero */}
         <NavLink
-          to="/Emprendedor"
+          to="/Perfil_emprendedores"
           className={({ isActive }) =>
             `flex items-center text-gray-700 hover:bg-gray-200 p-2 rounded transition-colors duration-200 ${
               isActive ? activeClassName : ""
@@ -59,8 +45,8 @@ const Menu = ({ onClose }) => {
           }
           onClick={onClose}
         >
-          <i className='bx bx-group mr-3 text-xl'></i>
-          <span>Gestión de Emprendedor</span>
+          <i className="bx bx-group mr-3 text-xl"></i>
+          <span>Perfiles de Emprendedores</span>
         </NavLink>
 
         {/* Aprobación de Solicitud */}
@@ -73,7 +59,7 @@ const Menu = ({ onClose }) => {
           }
           onClick={onClose}
         >
-          <i className='bx bx-check-circle mr-3 text-xl'></i>
+          <i className="bx bx-check-circle mr-3 text-xl"></i>
           <span>Aprobación de Solicitud de Credito</span>
         </NavLink>
 
@@ -87,7 +73,7 @@ const Menu = ({ onClose }) => {
           }
           onClick={onClose}
         >
-          <i className='bx bx-credit-card mr-3 text-xl'></i>
+          <i className="bx bx-credit-card mr-3 text-xl"></i>
           <span>Gestión de Crédito</span>
         </NavLink>
 
@@ -101,7 +87,7 @@ const Menu = ({ onClose }) => {
           }
           onClick={onClose}
         >
-          <i className='bx bx-money-withdraw mr-3 text-xl'></i>
+          <i className="bx bx-money-withdraw mr-3 text-xl"></i>
           <span>Gestión de Amortización</span>
         </NavLink>
       </nav>
