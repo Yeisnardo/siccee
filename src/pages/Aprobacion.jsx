@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2"; // Importa SweetAlert2
 import "../assets/css/style.css";
 import Header from "../components/Header";
 import Menu from "../components/Menu";
@@ -82,9 +83,16 @@ const Aprobacion = () => {
         )
       );
       setContadorSecuencial((prev) => prev + 1);
-      setMensajeExito(
-        `¡Solicitud aprobada! Número de contrato: ${contratoNumero}`
-      );
+      
+      // Usar Swal.fire para la alerta de éxito
+      Swal.fire({
+        icon: 'success',
+        title: '¡Solicitud aprobada!',
+        text: `Número de contrato: ${contratoNumero}`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      
       handleCerrarModal();
     }
   };
@@ -116,12 +124,12 @@ const Aprobacion = () => {
                 <i className="bx bx-check-circle text-2xl"></i>
               </div>
               <h1 className="text-3xl font-bold text-gray-800">
-                Aprobacion de Solicitud de Credito
+                Aprobación de Solicitud de Crédito
               </h1>
             </div>
           </header>
 
-                    {/* Buscador */}
+          {/* Buscador */}
           <div className="mb-6 max-w-4xl mx-auto flex flex-col items-start space-y-2">
             <label
               htmlFor="buscarSolicitante"
@@ -146,32 +154,50 @@ const Aprobacion = () => {
             {solicitudesFiltradas.map((s) => (
               <div
                 key={s.id}
-                className="bg-white p-4 rounded-xl shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl"
+                className="bg-white p-4 rounded-xl shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl relative"
               >
-                <h2 className="text-xl font-semibold mb-2">{s.solicitante}</h2>
+                {/* Icono en la tarjeta */}
+                <div className="absolute top-4 right-4 text-gray-400 text-xl">
+                  <i className="bx bx-user-circle"></i>
+                </div>
+                <h2 className="text-xl font-semibold mb-2 flex items-center space-x-2">
+                  <i className="bx bx-user text-blue-500"></i>
+                  <span>{s.solicitante}</span>
+                </h2>
                 <p className="mb-2">
                   <strong>Contrato:</strong>{" "}
                   {s.contrato ? s.contrato : "Pendiente"}
                 </p>
                 {/* Estado con color condicional */}
-                <p className={`mb-2 font-semibold ${
-                  s.estado === "Pendiente" ? "text-red-600" : "text-green-600"
-                }`}>
-                  <strong>Estado:</strong> {s.estado}
+                <p
+                  className={`mb-2 font-semibold ${
+                    s.estado === "Pendiente" ? "text-red-600" : "text-green-600"
+                  } flex items-center space-x-2`}
+                >
+                  <i
+                    className={`bx ${
+                      s.estado === "Pendiente"
+                        ? "bx-time"
+                        : "bx-check-circle"
+                    }`}
+                  ></i>
+                  <span>{s.estado}</span>
                 </p>
                 <div className="flex justify-end space-x-2 mt-4">
                   <button
-                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                    className="bg-blue-500 text-white px-3 py-1 rounded flex items-center space-x-2 hover:bg-blue-600 transition"
                     onClick={() => handleVerDetalles(s)}
                   >
-                    Ver detalles
+                    <i className="bx bx-show"></i>
+                    <span>Ver detalles</span>
                   </button>
                   {s.estado === "Pendiente" && (
                     <button
-                      className="bg-green-500 text-white px-3 py-1 rounded"
+                      className="bg-green-500 text-white px-3 py-1 rounded flex items-center space-x-2 hover:bg-green-600 transition"
                       onClick={() => handleAprobarDesdeLista(s)}
                     >
-                      Aprobar
+                      <i className="bx bx-check"></i>
+                      <span>Aprobar</span>
                     </button>
                   )}
                 </div>
@@ -190,13 +216,14 @@ const Aprobacion = () => {
           >
             <div className="bg-white p-6 rounded shadow-lg max-w-lg w-full relative">
               <button
-                className="absolute top-2 right-2 text-gray-600"
+                className="absolute top-2 right-2 text-gray-600 text-xl"
                 onClick={handleCerrarModal}
               >
                 ✖
               </button>
-              <h2 className="text-xl font-bold mb-4">
-                Detalles de {solicitudSeleccionada.solicitante}
+              <h2 className="text-xl font-bold mb-4 flex items-center space-x-2">
+                <i className="bx bx-info-circle"></i>
+                <span>Detalles de {solicitudSeleccionada.solicitante}</span>
               </h2>
               <p>
                 <strong>Emprendimiento:</strong>{" "}
@@ -219,9 +246,16 @@ const Aprobacion = () => {
                     solicitudSeleccionada.estado === "Pendiente"
                       ? "text-red-600"
                       : "text-green-600"
-                  }`}
+                  } flex items-center space-x-2`}
                 >
-                  {solicitudSeleccionada.estado}
+                  <i
+                    className={`bx ${
+                      solicitudSeleccionada.estado === "Pendiente"
+                        ? "bx-time"
+                        : "bx-check-circle"
+                    }`}
+                  ></i>
+                  <span>{solicitudSeleccionada.estado}</span>
                 </span>
               </p>
               <div className="mt-4 flex justify-end space-x-2">
@@ -234,10 +268,11 @@ const Aprobacion = () => {
                 {/* Botón en modal */}
                 {solicitudSeleccionada.estado !== "Aprobado" && (
                   <button
-                    className="bg-green-600 text-white px-4 py-2 rounded"
+                    className="bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 hover:bg-green-700 transition"
                     onClick={handleAprobar}
                   >
-                    Aprobar y asignar contrato
+                    <i className="bx bx-check"></i>
+                    <span>Aprobar y asignar contrato</span>
                   </button>
                 )}
               </div>
