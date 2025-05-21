@@ -6,6 +6,7 @@ import Usuario   from './pages/Usuario';
 import Perfil_emprendedores from './pages/Perfil_emprendedores'
 import Gestion from './pages/Gestion'
 import Aprobacion from './pages/Aprobacion'
+import Fondo from './pages/Fondo'
 import Amortizacion from './pages/Amortizacion'
 
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/Perfil_emprendedores" element={<Perfil_emprendedores />} />
         <Route path="/gestion" element={<Gestion />} />
         <Route path="/Aprobacion" element={<Aprobacion />} />
+        <Route path="/fondo" element={<Fondo />} />
         <Route path="/amortizacion" element={<Amortizacion />} />
       </Routes>
     </Router>

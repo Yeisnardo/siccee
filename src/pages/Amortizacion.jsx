@@ -114,10 +114,10 @@ const Amortizacion = () => {
           <header className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-2">
               <div className="bg-blue-500 p-3 rounded-full shadow-lg text-white">
-                <i className="bx bx-credit-card text-2xl"></i>
+                <i className="bx bx-money-withdraw text-2xl"></i>
               </div>
               <h1 className="text-3xl font-bold text-gray-800">
-                Gestor de Crédito
+                Gestion de Amortizacion
               </h1>
             </div>
           </header>

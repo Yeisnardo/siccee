@@ -63,6 +63,20 @@ const Menu = ({ onClose }) => {
           <span>Aprobación de Solicitud de Credito</span>
         </NavLink>
 
+         {/* Fondos */}
+        <NavLink
+          to="/Fondo"
+          className={({ isActive }) =>
+            `flex items-center text-gray-700 hover:bg-gray-200 p-2 rounded transition-colors duration-200 ${
+              isActive ? activeClassName : ""
+            }`
+          }
+          onClick={onClose}
+        >
+          <i className="bx bx-money-withdraw mr-3 text-xl"></i>
+          <span>Fondo Financiero de Credito</span>
+        </NavLink>
+
         {/* Gestión de Crédito */}
         <NavLink
           to="/Gestion"
