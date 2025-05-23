@@ -49,6 +49,20 @@ const Menu = ({ onClose }) => {
           <span>Perfiles de Emprendedores</span>
         </NavLink>
 
+        {/* Registro de Emprendimiento */}
+        <NavLink
+          to="/Emprendimiento" // Ensure this route is correct
+          className={({ isActive }) =>
+            `flex items-center text-gray-700 hover:bg-gray-200 p-2 rounded transition-colors duration-200 ${
+              isActive ? activeClassName : ""
+            }`
+          }
+          onClick={onClose}
+        >
+          <i className="bx bx-store mr-3 text-xl"></i> {/* New icon for Emprendimiento */}
+          <span>Registro de Emprendimiento</span>
+        </NavLink>
+
         {/* Aprobación de Solicitud */}
         <NavLink
           to="/Aprobacion"
@@ -63,7 +77,7 @@ const Menu = ({ onClose }) => {
           <span>Aprobación de Solicitud de Credito</span>
         </NavLink>
 
-         {/* Fondos */}
+        {/* Fondos */}
         <NavLink
           to="/Fondo"
           className={({ isActive }) =>

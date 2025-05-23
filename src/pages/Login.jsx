@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Importar useNavigate
-import Swal from 'sweetalert2'; // Importar SweetAlert2
+import Swal from "sweetalert2"; // Importar SweetAlert2
 import miImagen from "../assets/imagenes/logo_ifemi.jpg";
-import '../assets/css/style.css';
+import "../assets/css/style.css";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -15,9 +15,9 @@ const Login = () => {
     // Validación de campos vacíos
     if (username.trim() === "" || password.trim() === "") {
       Swal.fire({
-        icon: 'error',
-        title: 'Campos incompletos',
-        text: 'Por favor, completa todos los campos.',
+        icon: "error",
+        title: "Campos incompletos",
+        text: "Por favor, completa todos los campos.",
       });
       return;
     }
@@ -25,25 +25,30 @@ const Login = () => {
     // Validación adicional (ejemplo: mínimo de caracteres)
     if (username.length < 5) {
       Swal.fire({
-        icon: 'error',
-        title: 'Nombre de usuario inválido',
-        text: 'El nombre de usuario debe tener al menos 5 caracteres.',
+        icon: "error",
+        title: "Nombre de usuario inválido",
+        text: "El nombre de usuario debe tener al menos 5 caracteres.",
       });
       return;
     }
 
     if (password.length < 6) {
       Swal.fire({
-        icon: 'error',
-        title: 'Contraseña inválida',
-        text: 'La contraseña debe tener al menos 6 caracteres.',
+        icon: "error",
+        title: "Contraseña inválida",
+        text: "La contraseña debe tener al menos 6 caracteres.",
       });
       return;
     }
 
     // Si pasa todas las validaciones, navega
     // Aquí puedes agregar lógica de autenticación
-    navigate('/dashboard');
+    navigate("/dashboard");
+  };
+
+  const handleRegisterRedirect = () => {
+    // Navegar a la página de registro
+    navigate("/datosPersonales");
   };
 
   return (
@@ -117,6 +122,18 @@ const Login = () => {
               Iniciar Sesión
             </button>
           </form>
+          {/* Enlace de registro */}
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600">
+              ¿Emprededor no tienes cuenta?{" "}
+              <button
+                onClick={handleRegisterRedirect}
+                className="text-blue-600 hover:underline focus:outline-none"
+              >
+                Regístrate aquí
+              </button>
+            </p>
+          </div>
         </div>
       </div>
     </div>
