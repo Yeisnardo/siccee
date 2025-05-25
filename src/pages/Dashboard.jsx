@@ -1,16 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assets/css/style.css";
 import Header from "../components/Header";
 import Menu from "../components/Menu";
+import api from "../services/api_usuario"; // Asegúrate de importar tu archivo de API
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(true); // controla si el menu está abierto
+  const [user, setUser ] = useState(null); // Estado para almacenar la información del usuario
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
+  useEffect(() => {
+    // Simulación de inicio de sesión y obtención de datos del usuario
+    const fetchUserData = async () => {
+      try {
+        const response = await api.getUsers(); // Llama a la API para obtener los usuarios
+        // Aquí puedes establecer el usuario que deseas mostrar, por ejemplo, el primero
+        if (response.length > 0) {
+          setUser (response[0]); // Establece el primer usuario como el usuario actual
+        }
+      } catch (error) {
+        console.error("Error al obtener los usuarios:", error);
+        // Manejo de errores, redirigir o mostrar un mensaje
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -20,7 +40,7 @@ const Dashboard = () => {
       {/* Contenido principal, con margen para header y menu */}
       <div className="flex-1 flex flex-col ml-0 md:ml-64">
         {/* Header con botón para abrir/cerrar menu */}
-        <Header toggleMenu={toggleMenu} />
+        <Header user={user} toggleMenu={toggleMenu} menuOpen={menuOpen} />
 
         {/* Contenido debajo del header */}
         <div className="pt-20 px-8">
@@ -44,7 +64,7 @@ const Dashboard = () => {
                   <h2 className="text-2xl font-semibold mb-3 text-[#07142A]">
                     Resumen de usuario
                   </h2>
-                  <p className="text-gray-700 mb-2">Nombre: Yei5</p>
+                  <p className="text-gray-700 mb-2">Nombre: {user?.nombre || "Cargando..."}</p>
                   <p className="text-gray-700">
                     Status:{" "}
                     <span className="font-semibold text-green-500">Activo</span>

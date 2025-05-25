@@ -63,15 +63,15 @@ const RegistroPasos = () => {
   };
 
   const handleImageChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    const imageUrl = URL.createObjectURL(file);
-    setDatos((prevDatos) => ({
-      ...prevDatos,
-      fotoRostro: imageUrl,
-    }));
-  }
-};
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setDatos((prevDatos) => ({
+        ...prevDatos,
+        fotoRostro: imageUrl,
+      }));
+    }
+  };
 
   const handleNext = () => {
     // Validaciones por paso
@@ -573,92 +573,94 @@ const RegistroPasos = () => {
             </div>
           )}
 
-{/* Paso 5: Registro de Usuario */}
-{paso === 5 && (
-  <div>
-    <h3 className="text-xl mb-4">Registro de Usuario</h3>
-    
-    {/* Nombre de Usuario */}
-    <div className="mb-4">
-      <label
-        className="block mb-1 text-sm font-medium text-gray-600"
-        htmlFor="nombreUsuario"
-      >
-        Nombre de Usuario
-      </label>
-      <input
-        type="text"
-        id="nombreUsuario"
-        value={datos.nombreUsuario}
-        onChange={(e) => handleChange("nombreUsuario", e.target.value)}
-        className="w-full border border-gray-300 rounded px-3 py-2"
-        placeholder="Nombre de usuario"
-      />
-    </div>
-    
-    {/* Contraseña */}
-    <div className="mb-4">
-      <label
-        className="block mb-1 text-sm font-medium text-gray-600"
-        htmlFor="contrasena"
-      >
-        Contraseña
-      </label>
-      <input
-        type="password"
-        id="contrasena"
-        value={datos.contrasena}
-        onChange={(e) => handleChange("contrasena", e.target.value)}
-        className="w-full border border-gray-300 rounded px-3 py-2"
-        placeholder="Contraseña"
-      />
-    </div>
-    
-    {/* Sección para subir foto del rostro */}
-    <div className="mb-4">
-      <label
-        className="block mb-1 text-sm font-medium text-gray-600"
-        htmlFor="fotoRostro"
-      >
-        Foto del Rostro
-      </label>
-      {/* Input para seleccionar archivo */}
-      <input
-        type="file"
-        id="fotoRostro"
-        accept="image/*"
-        onChange={(e) => handleImageChange(e)}
-        className="mb-2"
-      />
-      {/* Mostrar la imagen seleccionada */}
-      {datos.fotoRostro && (
-        <div className="mt-2">
-          <img
-            src={datos.fotoRostro}
-            alt="Foto del Rostro"
-            className="w-32 h-32 object-cover rounded-full border-2 border-gray-300"
-          />
-        </div>
-      )}
-    </div>
-    
-    {/* Botones de navegación */}
-    <div className="flex justify-between mt-4">
-      <button
-        onClick={handleBack}
-        className="py-2 px-4 bg-gray-400 text-white rounded hover:bg-gray-500"
-      >
-        Anterior
-      </button>
-      <button
-        onClick={handleSubmit}
-        className="py-2 px-4 bg-green-600 text-white rounded hover:bg-green-700"
-      >
-        Finalizar
-      </button>
-    </div>
-  </div>
-)}
+          {/* Paso 5: Registro de Usuario */}
+          {paso === 5 && (
+            <div>
+              <h3 className="text-xl mb-4">Registro de Usuario</h3>
+
+              {/* Nombre de Usuario */}
+              <div className="mb-4">
+                <label
+                  className="block mb-1 text-sm font-medium text-gray-600"
+                  htmlFor="nombreUsuario"
+                >
+                  Nombre de Usuario
+                </label>
+                <input
+                  type="text"
+                  id="nombreUsuario"
+                  value={datos.nombreUsuario}
+                  onChange={(e) =>
+                    handleChange("nombreUsuario", e.target.value)
+                  }
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  placeholder="Nombre de usuario"
+                />
+              </div>
+
+              {/* Contraseña */}
+              <div className="mb-4">
+                <label
+                  className="block mb-1 text-sm font-medium text-gray-600"
+                  htmlFor="contrasena"
+                >
+                  Contraseña
+                </label>
+                <input
+                  type="password"
+                  id="contrasena"
+                  value={datos.contrasena}
+                  onChange={(e) => handleChange("contrasena", e.target.value)}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  placeholder="Contraseña"
+                />
+              </div>
+
+              {/* Sección para subir foto del rostro */}
+              <div className="mb-4">
+                <label
+                  className="block mb-1 text-sm font-medium text-gray-600"
+                  htmlFor="fotoRostro"
+                >
+                  Foto del Rostro
+                </label>
+                {/* Input para seleccionar archivo */}
+                <input
+                  type="file"
+                  id="fotoRostro"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange(e)}
+                  className="mb-2"
+                />
+                {/* Mostrar la imagen seleccionada */}
+                {datos.fotoRostro && (
+                  <div className="mt-2">
+                    <img
+                      src={datos.fotoRostro}
+                      alt="Foto del Rostro"
+                      className="w-32 h-32 object-cover rounded-full border-2 border-gray-300"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Botones de navegación */}
+              <div className="flex justify-between mt-4">
+                <button
+                  onClick={handleBack}
+                  className="py-2 px-4 bg-gray-400 text-white rounded hover:bg-gray-500"
+                >
+                  Anterior
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="py-2 px-4 bg-green-600 text-white rounded hover:bg-green-700"
+                >
+                  Finalizar
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

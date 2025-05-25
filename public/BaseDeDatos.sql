@@ -1,0 +1,8 @@
+CREATE TABLE usuario (
+  cedula VARCHAR(20) NOT NULL PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  usuario VARCHAR(50) NOT NULL UNIQUE,
+  contrasena VARCHAR(255) NOT NULL,
+  rol VARCHAR(50) NOT NULL,
+  estatus VARCHAR(20) NOT NULL
+);

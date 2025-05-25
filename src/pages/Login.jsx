@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Importar useNavigate
-import Swal from "sweetalert2"; // Importar SweetAlert2
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import axios from 'axios';
 import miImagen from "../assets/imagenes/logo_ifemi.jpg";
 import "../assets/css/style.css";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); // Crear la función de navegación
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validación de campos vacíos
@@ -22,7 +23,7 @@ const Login = () => {
       return;
     }
 
-    // Validación adicional (ejemplo: mínimo de caracteres)
+    // Validación adicional
     if (username.length < 5) {
       Swal.fire({
         icon: "error",
@@ -41,13 +42,39 @@ const Login = () => {
       return;
     }
 
-    // Si pasa todas las validaciones, navega
-    // Aquí puedes agregar lógica de autenticación
-    navigate("/dashboard");
+    try {
+      // Realizar la solicitud de inicio de sesión
+      const response = await axios.post('http://localhost:5000/api/usuarios/login', {
+        usuario: username,
+        contrasena: password,
+      });
+
+      // Suponiendo que response.data tiene usuario y message
+      const user = response.data.user;
+
+      // Guardar usuario y su estatus en localStorage
+      localStorage.setItem('usuario', JSON.stringify(user));
+      localStorage.setItem('estatus', user.estatus);
+
+      // Mostrar éxito y redirigir
+      Swal.fire({
+        icon: "success",
+        title: "Éxito",
+        text: response.data.message || "Inicio de sesión exitoso",
+      }).then(() => {
+        navigate("/dashboard");
+      });
+    } catch (error) {
+      // Manejar errores
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response?.data?.error || "Error al iniciar sesión",
+      });
+    }
   };
 
   const handleRegisterRedirect = () => {
-    // Navegar a la página de registro
     navigate("/datosPersonales");
   };
 
@@ -61,7 +88,7 @@ const Login = () => {
           {/* Imagen */}
           <img
             src={miImagen}
-            alt="Descripción de la imagen"
+            alt="Logo Efemi"
             className="max-w-xs max-h-xs object-cover relative z-10"
           />
         </div>
@@ -125,7 +152,7 @@ const Login = () => {
           {/* Enlace de registro */}
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-600">
-              ¿Emprededor no tienes cuenta?{" "}
+              ¿No tienes cuenta?{" "}
               <button
                 onClick={handleRegisterRedirect}
                 className="text-blue-600 hover:underline focus:outline-none"

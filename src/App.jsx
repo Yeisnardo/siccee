@@ -1,31 +1,98 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AppLayout from './components/AppLayout';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import DatosPersonales from './pages/DatosPersonales';
-import Usuario   from './pages/Usuario';
-import Perfil_emprendedores from './pages/Perfil_emprendedores'
-import Emprendimiento from './pages/Emprendimiento'
-import Gestion from './pages/Gestion'
-import Aprobacion from './pages/Aprobacion'
-import Fondo from './pages/Fondo'
-import Amortizacion from './pages/Amortizacion'
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import DatosPersonales from "./pages/DatosPersonales";
+import Usuario from "./pages/Usuario";
+import Perfil_emprendedores from "./pages/Perfil_emprendedores";
+import Emprendimiento from "./pages/Emprendimiento";
+import Gestion from "./pages/Gestion";
+import Aprobacion from "./pages/Aprobacion";
+import Fondo from "./pages/Fondo";
+import Amortizacion from "./pages/Amortizacion";
 
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Ruta pública */}
         <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/datosPersonales" element={<DatosPersonales />} />
-        <Route path="/usuario" element={<Usuario />} />
-        <Route path="/perfil_emprendedores" element={<Perfil_emprendedores />} />
-        <Route path="/emprendimiento" element={<Emprendimiento />} />
-        <Route path="/gestion" element={<Gestion />} />
-        <Route path="/aprobacion" element={<Aprobacion />} />
-        <Route path="/fondo" element={<Fondo />} />
-        <Route path="/amortizacion" element={<Amortizacion />} />
+
+        {/* Rutas protegidas */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/datosPersonales"
+          element={
+            <ProtectedRoute>
+              <DatosPersonales />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/usuario"
+          element={
+            <ProtectedRoute>
+              <Usuario />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/perfil_emprendedores"
+          element={
+            <ProtectedRoute>
+              <Perfil_emprendedores />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/emprendimiento"
+          element={
+            <ProtectedRoute>
+              <Emprendimiento />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/gestion"
+          element={
+            <ProtectedRoute>
+              <Gestion />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/aprobacion"
+          element={
+            <ProtectedRoute>
+              <Aprobacion />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/fondo"
+          element={
+            <ProtectedRoute>
+              <Fondo />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/amortizacion"
+          element={
+            <ProtectedRoute>
+              <Amortizacion />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
