@@ -6,10 +6,13 @@ import "../assets/css/style.css";
 
 const Header = ({ toggleMenu, menuOpen, user }) => {
   const navigate = useNavigate();
+
+  // Estados para menús y perfil en línea
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOnline, setProfileOnline] = useState(true);
 
+  // Funciones para manejar apertura/cierre de menús
   const handleToggleProfileMenu = () => {
     setProfileMenuOpen(!profileMenuOpen);
   };
@@ -18,6 +21,7 @@ const Header = ({ toggleMenu, menuOpen, user }) => {
     setNotificationsOpen(!notificationsOpen);
   };
 
+  // Función para cerrar sesión con confirmación
   const handleCerrarSesion = () => {
     Swal.fire({
       title: "¿Estás seguro que quieres cerrar sesión?",
@@ -34,8 +38,8 @@ const Header = ({ toggleMenu, menuOpen, user }) => {
     });
   };
 
+  // Función para abrir configuración (cambiar contraseña o usuario)
   const handleAbrirConfiguracion = async () => {
-    // Preguntar qué desea cambiar
     const { value } = await Swal.fire({
       title: '¿Qué deseas cambiar?',
       input: 'radio',
@@ -139,7 +143,7 @@ const Header = ({ toggleMenu, menuOpen, user }) => {
         <i className={`bx ${menuOpen ? "bxs-x" : "bx-menu"}`} style={{ fontSize: "24px" }}></i>
       </button>
 
-      {/* Botones de navegación */}
+      {/* Navegación */}
       <div className="flex items-center space-x-2 md:space-x-4">
         {/* Ejemplo: Botones de navegación */}
         <button
@@ -243,32 +247,33 @@ const Header = ({ toggleMenu, menuOpen, user }) => {
       </div>
 
       {/* Tarjeta perfil en línea estilo WhatsApp */}
-{profileOnline && (
-  <div className="fixed bottom-4 right-4 w-80 bg-white rounded-lg shadow-lg z-50 p-4 animate-fadeInUp">
-    <div className="flex items-center mb-4">
-      <div className="relative">
-        <div className="relative">
-          <img
-            src="../public/OIP.jpeg" // Aquí puedes poner la foto del usuario
-            alt="Perfil"
-            className="w-20 h-20 rounded-full object-cover border-4 border-green-500"
-          />
-          <span className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full animate-pulse"></span>
+      {profileOnline && (
+        <div className="fixed bottom-4 right-4 w-80 bg-white rounded-lg shadow-lg z-50 p-4 animate-fadeInUp">
+          <div className="flex items-center mb-4">
+            {/* Imagen de perfil */}
+            <div className="relative">
+              <img
+                src="../public/OIP.jpeg" // Imagen del usuario
+                alt="Perfil"
+                className="w-20 h-20 rounded-full object-cover border-4 border-green-500"
+              />
+              {/* Indicador en línea */}
+              <span className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full animate-pulse"></span>
+            </div>
+            {/* Información del usuario */}
+            <div className="ml-4">
+              <h3 className="text-lg font-semibold text-gray-700 flex items-center">
+                <i className="bx bx-user-circle mr-2 text-xl text-gray-600"></i>
+                {user?.nombre}
+              </h3>
+              <p className="text-sm text-gray-500 flex items-center">
+                <i className="bx bx-shield-quarter mr-2 text-lg text-gray-400"></i>
+                Rol: <span className="font-semibold ml-1">{user?.rol || "Rol"}</span>
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="ml-4">
-        <h3 className="text-lg font-semibold text-gray-700 flex items-center">
-          <i className="bx bx-user-circle mr-2 text-xl text-gray-600"></i>
-          {user?.nombre || "Usuario"} {/* Muestra el nombre del usuario */}
-        </h3>
-        <p className="text-sm text-gray-500 flex items-center">
-          <i className="bx bx-shield-quarter mr-2 text-lg text-gray-400"></i>
-          Rol: <span className="font-semibold ml-1">{user?.rol || "Rol"}</span> {/* Muestra el rol del usuario */}
-        </p>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </header>
   );
 };
