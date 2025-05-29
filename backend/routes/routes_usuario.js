@@ -4,9 +4,9 @@ const usuarioController = require('../controllers/controlador_usuario');
 const verificarEstatusUsuario = require('../middlewares/verificarEstatus');
 
 // Rutas para usuarios
-router.get('/', usuarioController.getUsuario);
+router.get('/', usuarioController.getUsuario); // <-- Verifica que la función sea 'getUsuario' o 'getUsuarios'
 router.post('/', usuarioController.createUsuario);
-router.post('/login', usuarioController.loginUsuario); // <-- Añade esta línea
+router.post('/login', usuarioController.loginUsuario); // Añadido
 router.put('/:cedula', usuarioController.updateUsuario);
 router.delete('/:cedula', usuarioController.deleteUsuario);
 router.put('/:cedula/estatus', usuarioController.updateEstatusUsuario);

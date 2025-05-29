@@ -2,7 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import miImagen from "../assets/imagenes/logo_ifemi.jpg";
-import { locationData } from "../components/Venezuela"; // Tus datos
+import { locationData } from "../components/Venezuela";
+
+// Importa tus servicios API ajustando las rutas y nombres
+import usuarioService from '../services/api_usuario';
+import emprendedorService from '../services/api_emprendedores';
+import ubicacionService from '../services/api_ubicaciones';
+import consejoService from '../services/api_consejoComunal';
+import emprendimientoService from '../services/api_empredimiento';
+
 import "../assets/css/style.css";
 
 const RegistroPasos = () => {
@@ -14,31 +22,28 @@ const RegistroPasos = () => {
     nombreCompleto: "",
     telefono: "",
     email: "",
-    // Dirección
     estado: "",
     municipio: "",
     parroquia: "",
     direccionActual: "",
-    // Consejo Comunal
     consejoNombre: "",
     consejoDireccion: "",
     comuna: "",
-    // Emprendimiento
     sector: "",
     tipoNegocio: "",
     nombreEmprendimiento: "",
     direccionEmprendimiento: "",
-    // Usuario
     nombreUsuario: "",
     contrasena: "",
-    estatus: "activo", // Valor por defecto
-    tipoUsuario: "Emprendedor", // Valor por defecto
-    fotoRostro: null, // aquí se guarda la URL de la imagen
+    estatus: "activo",
+    tipoUsuario: "Emprendedor",
+    fotoRostro: null,
   });
 
   const [municipios, setMunicipios] = useState([]);
   const [parroquias, setParroquias] = useState([]);
 
+  // Actualiza municipios y parroquias en función del estado seleccionado
   useEffect(() => {
     if (datos.estado) {
       const estadoActual = locationData.find((e) => e.estado === datos.estado);
@@ -65,11 +70,83 @@ const RegistroPasos = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setDatos((prevDatos) => ({
-        ...prevDatos,
-        fotoRostro: imageUrl,
-      }));
+      const reader = new FileReader();
+      reader.onload = () => {
+        setDatos((prevDatos) => ({
+          ...prevDatos,
+          fotoRostro: reader.result,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Función para gestionar el proceso de registro completo en el backend
+  const handleRegister = async () => {
+    try {
+      // Crear usuario
+      const nuevoUsuario = {
+        nombre_usuario: datos.nombreUsuario,
+        contrasena: datos.contrasena,
+        estatus: datos.estatus,
+        tipo_usuario: datos.tipoUsuario,
+        foto_rostro: datos.fotoRostro,
+      };
+      const usuarioCreado = await usuarioService.createUsuario(nuevoUsuario);
+
+      // Crear emprendedor
+      const nuevoEmprendedor = {
+        usuario_id: usuarioCreado.id,
+        cedula: datos.cedula,
+        nombre_completo: datos.nombreCompleto,
+        telefono: datos.telefono,
+        email: datos.email,
+      };
+      const emprendedorCreado = await emprendedorService.createEmprendedor(nuevoEmprendedor);
+
+      // Crear ubicación
+      const nuevaUbicacion = {
+        estado: datos.estado,
+        municipio: datos.municipio,
+        parroquia: datos.parroquia,
+        direccion_actual: datos.direccionActual,
+        emprendedor_id: emprendedorCreado.id,
+      };
+      await ubicacionService.createUbicacion(nuevaUbicacion);
+
+      // Crear consejo comunal
+      const nuevoConsejo = {
+        emprendedor_id: emprendedorCreado.id,
+        consejo_nombre: datos.consejoNombre,
+        consejo_direccion: datos.consejoDireccion,
+        comuna: datos.comuna,
+      };
+      await consejoService.createConsejo(nuevoConsejo);
+
+      // Crear emprendimiento
+      const nuevoEmprendimiento = {
+        emprendedor_id: emprendedorCreado.id,
+        sector: datos.sector,
+        tipo_negocio: datos.tipoNegocio,
+        nombre_emprendimiento: datos.nombreEmprendimiento,
+        direccion_emprendimiento: datos.direccionEmprendimiento,
+      };
+      await emprendimientoService.createEmprendimiento(nuevoEmprendimiento);
+
+      Swal.fire({
+        icon: "success",
+        title: "Registro completo",
+        text: "Tus datos han sido registrados correctamente.",
+      });
+      navigate("/");
+
+    } catch (error) {
+      console.error("Error al registrar los datos:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error en el registro",
+        text: "Hubo un problema al guardar los datos. Intenta nuevamente.",
+      });
     }
   };
 
@@ -140,6 +217,7 @@ const RegistroPasos = () => {
         return;
       }
     }
+
     if (paso < 5) {
       setPaso(paso + 1);
     }
@@ -149,14 +227,8 @@ const RegistroPasos = () => {
     if (paso > 1) setPaso(paso - 1);
   };
 
-  const handleSubmit = () => {
-    // Aquí puedes enviar los datos a una API
-    Swal.fire({
-      icon: "success",
-      title: "Registro completo",
-      text: "Tus datos han sido registrados correctamente.",
-    });
-    navigate("/");
+  const handleFinalizar = () => {
+    handleRegister();
   };
 
   return (
@@ -173,6 +245,7 @@ const RegistroPasos = () => {
             Registro de Emprendedor
           </h2>
 
+          {/* Indicadores de pasos */}
           <div className="flex justify-center mb-4 space-x-3">
             {[1, 2, 3, 4, 5].map((n) => (
               <button
@@ -182,16 +255,14 @@ const RegistroPasos = () => {
                     setPaso(n);
                     document
                       .querySelector(`#paso-${n}`)
-                      .scrollIntoView({ behavior: "smooth" });
+                      ?.scrollIntoView({ behavior: "smooth" });
                   }
                 }}
                 className={`w-8 h-8 flex items-center justify-center rounded-full transition-all duration-300 cursor-pointer ${
                   paso === n ? "bg-blue-500 scale-125" : "bg-gray-400"
                 }`}
               >
-                {/* Mostrar check si el paso está completo, número si no */}
                 {n < paso ? (
-                  // Icono de check (SVG inline)
                   <svg
                     className="w-4 h-4 text-white"
                     fill="none"
@@ -212,16 +283,15 @@ const RegistroPasos = () => {
             ))}
           </div>
 
-          {/* Paso 1: Datos personales */}
+          {/* Contenido por paso */}
+
+          {/* PASO 1: Datos Personales */}
           {paso === 1 && (
             <div>
               <h3 className="text-xl mb-4">Datos Personales</h3>
               {/* Inputs */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="cedula"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="cedula">
                   Cédula
                 </label>
                 <input
@@ -234,28 +304,20 @@ const RegistroPasos = () => {
                 />
               </div>
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="nombreCompleto"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="nombreCompleto">
                   Nombre Completo
                 </label>
                 <input
                   type="text"
                   id="nombreCompleto"
                   value={datos.nombreCompleto}
-                  onChange={(e) =>
-                    handleChange("nombreCompleto", e.target.value)
-                  }
+                  onChange={(e) => handleChange("nombreCompleto", e.target.value)}
                   className="w-full border border-gray-300 rounded px-3 py-2"
                   placeholder="Ingresa tu nombre completo"
                 />
               </div>
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="telefono"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="telefono">
                   Teléfono
                 </label>
                 <input
@@ -268,10 +330,7 @@ const RegistroPasos = () => {
                 />
               </div>
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="email"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="email">
                   Correo Electrónico
                 </label>
                 <input
@@ -283,6 +342,7 @@ const RegistroPasos = () => {
                   placeholder="ejemplo@correo.com"
                 />
               </div>
+              {/* Botón Siguiente */}
               <button
                 onClick={handleNext}
                 className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -292,16 +352,13 @@ const RegistroPasos = () => {
             </div>
           )}
 
-          {/* Paso 2: Dirección */}
+          {/* PASO 2: Dirección */}
           {paso === 2 && (
             <div>
               <h3 className="text-xl mb-4">Dirección del Emprendedor</h3>
               {/* Estado */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="estado"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="estado">
                   Estado
                 </label>
                 <select
@@ -320,10 +377,7 @@ const RegistroPasos = () => {
               </div>
               {/* Municipio */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="municipio"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="municipio">
                   Municipio
                 </label>
                 <select
@@ -343,10 +397,7 @@ const RegistroPasos = () => {
               </div>
               {/* Parroquia */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="parroquia"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="parroquia">
                   Parroquia
                 </label>
                 <select
@@ -366,19 +417,14 @@ const RegistroPasos = () => {
               </div>
               {/* Dirección actual */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="direccionActual"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="direccionActual">
                   Dirección Actual
                 </label>
                 <input
                   type="text"
                   id="direccionActual"
                   value={datos.direccionActual}
-                  onChange={(e) =>
-                    handleChange("direccionActual", e.target.value)
-                  }
+                  onChange={(e) => handleChange("direccionActual", e.target.value)}
                   className="w-full border border-gray-300 rounded px-3 py-2"
                   placeholder="Dirección actual"
                 />
@@ -401,54 +447,41 @@ const RegistroPasos = () => {
             </div>
           )}
 
-          {/* Paso 3: Datos del Consejo */}
+          {/* PASO 3: Datos del Consejo */}
           {paso === 3 && (
             <div>
               <h3 className="text-xl mb-4">Datos del Consejo Comunal</h3>
               {/* Sector */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="consejoNombre"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="consejoNombre">
                   Sector
                 </label>
                 <input
                   type="text"
                   id="consejoNombre"
                   value={datos.consejoNombre}
-                  onChange={(e) =>
-                    handleChange("consejoNombre", e.target.value)
-                  }
+                  onChange={(e) => handleChange("consejoNombre", e.target.value)}
                   className="w-full border border-gray-300 rounded px-3 py-2"
                   placeholder="Sector"
                 />
               </div>
               {/* Consejo */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="consejoDireccion"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="consejoDireccion">
                   Consejo Comunal
                 </label>
                 <input
                   type="text"
                   id="consejoDireccion"
                   value={datos.consejoDireccion}
-                  onChange={(e) =>
-                    handleChange("consejoDireccion", e.target.value)
-                  }
+                  onChange={(e) => handleChange("consejoDireccion", e.target.value)}
                   className="w-full border border-gray-300 rounded px-3 py-2"
                   placeholder="Dirección del Consejo"
                 />
               </div>
-              {/* Contacto */}
+              {/* Comunidad */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="comuna"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="comuna">
                   Comuna
                 </label>
                 <input
@@ -478,16 +511,13 @@ const RegistroPasos = () => {
             </div>
           )}
 
-          {/* Paso 4: Registro de Emprendimiento */}
+          {/* PASO 4: Registro de Emprendimiento */}
           {paso === 4 && (
             <div>
               <h3 className="text-xl mb-4">Registro de Emprendimiento</h3>
               {/* Sector */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="sector"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="sector">
                   Sector
                 </label>
                 <input
@@ -501,10 +531,7 @@ const RegistroPasos = () => {
               </div>
               {/* Tipo de Negocio */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="tipoNegocio"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="tipoNegocio">
                   Tipo de Negocio
                 </label>
                 <input
@@ -518,43 +545,32 @@ const RegistroPasos = () => {
               </div>
               {/* Nombre del Emprendimiento */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="nombreEmprendimiento"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="nombreEmprendimiento">
                   Nombre del Emprendimiento
                 </label>
                 <input
                   type="text"
                   id="nombreEmprendimiento"
                   value={datos.nombreEmprendimiento}
-                  onChange={(e) =>
-                    handleChange("nombreEmprendimiento", e.target.value)
-                  }
+                  onChange={(e) => handleChange("nombreEmprendimiento", e.target.value)}
                   className="w-full border border-gray-300 rounded px-3 py-2"
                   placeholder="Nombre del emprendimiento"
                 />
               </div>
               {/* Dirección del Emprendimiento */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="direccionEmprendimiento"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="direccionEmprendimiento">
                   Dirección del Emprendimiento
                 </label>
                 <input
                   type="text"
                   id="direccionEmprendimiento"
                   value={datos.direccionEmprendimiento}
-                  onChange={(e) =>
-                    handleChange("direccionEmprendimiento", e.target.value)
-                  }
+                  onChange={(e) => handleChange("direccionEmprendimiento", e.target.value)}
                   className="w-full border border-gray-300 rounded px-3 py-2"
                   placeholder="Dirección del emprendimiento"
                 />
               </div>
-
               {/* Botones */}
               <div className="flex justify-between">
                 <button
@@ -573,37 +589,27 @@ const RegistroPasos = () => {
             </div>
           )}
 
-          {/* Paso 5: Registro de Usuario */}
+          {/* PASO 5: Registro de Usuario */}
           {paso === 5 && (
             <div>
               <h3 className="text-xl mb-4">Registro de Usuario</h3>
-
               {/* Nombre de Usuario */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="nombreUsuario"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="nombreUsuario">
                   Nombre de Usuario
                 </label>
                 <input
                   type="text"
                   id="nombreUsuario"
                   value={datos.nombreUsuario}
-                  onChange={(e) =>
-                    handleChange("nombreUsuario", e.target.value)
-                  }
+                  onChange={(e) => handleChange("nombreUsuario", e.target.value)}
                   className="w-full border border-gray-300 rounded px-3 py-2"
                   placeholder="Nombre de usuario"
                 />
               </div>
-
               {/* Contraseña */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="contrasena"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="contrasena">
                   Contraseña
                 </label>
                 <input
@@ -615,24 +621,18 @@ const RegistroPasos = () => {
                   placeholder="Contraseña"
                 />
               </div>
-
-              {/* Sección para subir foto del rostro */}
+              {/* Foto del rostro */}
               <div className="mb-4">
-                <label
-                  className="block mb-1 text-sm font-medium text-gray-600"
-                  htmlFor="fotoRostro"
-                >
+                <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="fotoRostro">
                   Foto del Rostro
                 </label>
-                {/* Input para seleccionar archivo */}
                 <input
                   type="file"
                   id="fotoRostro"
                   accept="image/*"
-                  onChange={(e) => handleImageChange(e)}
+                  onChange={handleImageChange}
                   className="mb-2"
                 />
-                {/* Mostrar la imagen seleccionada */}
                 {datos.fotoRostro && (
                   <div className="mt-2">
                     <img
@@ -643,8 +643,7 @@ const RegistroPasos = () => {
                   </div>
                 )}
               </div>
-
-              {/* Botones de navegación */}
+              {/* Botones */}
               <div className="flex justify-between mt-4">
                 <button
                   onClick={handleBack}
@@ -653,7 +652,7 @@ const RegistroPasos = () => {
                   Anterior
                 </button>
                 <button
-                  onClick={handleSubmit}
+                  onClick={handleFinalizar}
                   className="py-2 px-4 bg-green-600 text-white rounded hover:bg-green-700"
                 >
                   Finalizar

@@ -1,82 +1,133 @@
+// controllers/controlador_usuario.js
+
 const { query } = require('../config/db');
 
+// Función para validar los datos del usuario
 const validarUsuario = (usuario) => {
-  // Ejemplo simple: verificar que los campos estén presentes y no sean vacíos
-  const { cedula, nombre, usuario: user, contrasena, rol } = usuario;
+  const { cedula, usuario: nombreUsuario, contrasena, rol, foto_rostro } = usuario;
+
   if (
-    !cedula || !nombre || !user || !contrasena || !rol ||
-    cedula.trim() === "" || nombre.trim() === "" || user.trim() === "" ||
-    contrasena.trim() === "" || rol.trim() === ""
+    !cedula || cedula.trim() === "" ||
+    !nombreUsuario || nombreUsuario.trim() === "" ||
+    !contrasena || contrasena.trim() === "" ||
+    !rol || rol.trim() === ""
   ) {
     throw new Error("Campos incompletos o inválidos");
   }
-  // Puedes agregar más validaciones específicas aquí
+
+  // Si quieres validar que, si se envía, foto_rostro sea una cadena base64 válida, puedes agregar una validación adicional
+  if (foto_rostro && typeof foto_rostro !== 'string') {
+    throw new Error("La foto debe ser una cadena en base64");
+  }
 };
 
+// Obtener todos los usuarios
 const getUsuario = async (req, res) => {
   try {
-    const result = await query('SELECT * FROM usuario');
-    res.json(result.rows);
+    const result = await query('SELECT * FROM usuarios');
+    // Convertir foto_rostro a base64 para enviarla al frontend
+    const usuariosConFotoBase64 = result.rows.map(usuario => ({
+      ...usuario,
+      foto_rostro: usuario.foto_rostro ? usuario.foto_rostro.toString('base64') : null
+    }));
+    res.json(usuariosConFotoBase64);
   } catch (err) {
     console.error('Error en getUsuario:', err);
     res.status(500).json({ error: 'Error al obtener usuarios' });
   }
 };
 
+// Crear un nuevo usuario
 const createUsuario = async (req, res) => {
   try {
     validarUsuario(req.body);
-    const { cedula, nombre, usuario, contrasena, rol, estatus } = req.body;
+    const { cedula, usuario: nombreUsuario, contrasena, rol, estatus, tipo_usuario, foto_rostro } = req.body;
+
+    // Convertir la foto de base64 a Buffer si existe
+    const bufferFoto = foto_rostro ? Buffer.from(foto_rostro, 'base64') : null;
+
     const result = await query(
-      'INSERT INTO usuario (cedula, nombre, usuario, contrasena, rol, estatus) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [cedula, nombre, usuario, contrasena, rol, estatus]
+      `INSERT INTO usuarios (cedula, usuario, contrasena, rol, estatus, tipo_usuario, foto_rostro)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING *`,
+      [cedula, nombreUsuario, contrasena, rol, estatus || 'activo', tipo_usuario || 'Emprendedor', bufferFoto]
     );
-    res.status(201).json(result.rows[0]);
+    // Devolver la respuesta con la foto en base64
+    const usuarioCreado = result.rows[0];
+    if (usuarioCreado.foto_rostro) {
+      usuarioCreado.foto_rostro = usuarioCreado.foto_rostro.toString('base64');
+    }
+    res.status(201).json(usuarioCreado);
   } catch (err) {
     console.error('Error en createUsuario:', err);
     res.status(500).json({ error: err.message });
   }
 };
 
+// Actualizar un usuario por cédula (incluyendo la foto opcionalmente)
 const updateUsuario = async (req, res) => {
   try {
     const { cedula } = req.params;
-    const { nombre, usuario, contrasena, rol, estatus } = req.body;
+    const { usuario: nombreUsuario, contrasena, rol, estatus, tipo_usuario, foto_rostro } = req.body;
 
-    // Validate input
-    if (!nombre || !usuario || !rol) {
-      return res.status(400).json({ error: 'Campos incompletos' });
+    if (!nombreUsuario || !rol) {
+      return res.status(400).json({ error: 'Campos obligatorios incompletos' });
     }
 
-    const result = await query(
-      `UPDATE usuario 
-       SET nombre = $1, usuario = $2, contrasena = $3, rol = $4, estatus = $5
-       WHERE cedula = $6
-       RETURNING *`,
-      [nombre, usuario, contrasena, rol, estatus, cedula]
-    );
+    // Preparar los datos para la actualización
+    const params = [
+      nombreUsuario,
+      contrasena,
+      rol,
+      estatus,
+      tipo_usuario,
+      // Solo actualizar foto si se envía
+      foto_rostro ? Buffer.from(foto_rostro, 'base64') : null,
+      cedula
+    ];
+
+    // Construir la consulta para actualizar la foto solo si se envió
+    const queryText = `
+      UPDATE usuarios
+      SET usuario = $1,
+          contrasena = $2,
+          rol = $3,
+          estatus = $4,
+          tipo_usuario = $5,
+          foto_rostro = COALESCE($6, foto_rostro)
+      WHERE cedula = $7
+      RETURNING *`;
+
+    const result = await query(queryText, params);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
-    res.json(result.rows[0]);
+
+    const usuarioActualizado = result.rows[0];
+    if (usuarioActualizado.foto_rostro) {
+      usuarioActualizado.foto_rostro = usuarioActualizado.foto_rostro.toString('base64');
+    }
+
+    res.json(usuarioActualizado);
   } catch (err) {
     console.error('Error en updateUsuario:', err);
     res.status(500).json({ error: err.message });
   }
 };
 
-
+// Actualizar solo el estatus del usuario
 const updateEstatusUsuario = async (req, res) => {
   try {
     const { cedula } = req.params;
-    const { estatus } = req.body; // esperas recibir solo el nuevo estatus
+    const { estatus } = req.body;
+
     if (!estatus || (estatus !== 'Activo' && estatus !== 'Inactivo')) {
       return res.status(400).json({ error: 'Estatus inválido' });
     }
 
     const result = await query(
-      'UPDATE usuario SET estatus = $1 WHERE cedula = $2 RETURNING *',
+      'UPDATE usuarios SET estatus = $1 WHERE cedula = $2 RETURNING *',
       [estatus, cedula]
     );
 
@@ -90,10 +141,11 @@ const updateEstatusUsuario = async (req, res) => {
   }
 };
 
+// Eliminar un usuario por cédula
 const deleteUsuario = async (req, res) => {
   try {
     const { cedula } = req.params;
-    const result = await query('DELETE FROM usuario WHERE cedula = $1 RETURNING *', [cedula]);
+    const result = await query('DELETE FROM usuarios WHERE cedula = $1 RETURNING *', [cedula]);
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
@@ -104,10 +156,11 @@ const deleteUsuario = async (req, res) => {
   }
 };
 
+// Inicio de sesión del usuario
 const loginUsuario = async (req, res) => {
   try {
-    const { usuario, contrasena } = req.body;
-    const result = await query('SELECT * FROM usuario WHERE usuario = $1', [usuario]);
+    const { usuario: nombreUsuario, contrasena } = req.body;
+    const result = await query('SELECT * FROM usuarios WHERE usuario = $1', [nombreUsuario]);
 
     if (result.rows.length === 0) {
       return res.status(401).json({ error: 'Usuario no encontrado' });
@@ -115,12 +168,16 @@ const loginUsuario = async (req, res) => {
 
     const user = result.rows[0];
 
-    // Aquí deberías comparar la contraseña (usa bcrypt para hashear y comparar contraseñas)
+    // Comparar contraseñas hashed con bcrypt si implementas hashing
     if (user.contrasena !== contrasena) {
       return res.status(401).json({ error: 'Contraseña incorrecta' });
     }
 
-    // Si las credenciales son correctas, puedes devolver un token o un mensaje de éxito
+    // Enviar la info del usuario, incluyendo la foto en base64
+    if (user.foto_rostro) {
+      user.foto_rostro = user.foto_rostro.toString('base64');
+    }
+
     res.json({ message: 'Inicio de sesión exitoso', user });
   } catch (err) {
     console.error('Error en loginUsuario:', err);
@@ -135,5 +192,5 @@ module.exports = {
   deleteUsuario,
   loginUsuario,
   validarUsuario,
-  updateEstatusUsuario, // Añadir aquí
+  updateEstatusUsuario,
 };
