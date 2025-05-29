@@ -159,8 +159,8 @@ const deleteUsuario = async (req, res) => {
 // Inicio de sesión del usuario
 const loginUsuario = async (req, res) => {
   try {
-    const { usuario: nombreUsuario, contrasena } = req.body;
-    const result = await query('SELECT * FROM usuarios WHERE usuario = $1', [nombreUsuario]);
+    const { usuario: nombre_usuario, contrasena } = req.body;
+    const result = await query('SELECT * FROM usuarios WHERE nombre_usuario = $1', [nombre_usuario]);
 
     if (result.rows.length === 0) {
       return res.status(401).json({ error: 'Usuario no encontrado' });

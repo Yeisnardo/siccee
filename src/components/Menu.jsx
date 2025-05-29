@@ -21,6 +21,48 @@ const Menu = ({ onClose }) => {
           <span>Inicio</span>
         </NavLink>
 
+        {/* Gestión de Amortización */}
+        <NavLink
+          to="/amortizacion"
+          className={({ isActive }) =>
+            `flex items-center text-gray-700 hover:bg-gray-200 p-2 rounded transition-colors duration-200 ${
+              isActive ? activeClassName : ""
+            }`
+          }
+          onClick={onClose}
+        >
+          <i className="bx bx-money-withdraw mr-3 text-xl"></i>
+          <span>Solicitud de Credito</span>
+        </NavLink>
+
+        {/* Gestión de Amortización */}
+        <NavLink
+          to="/amortizacion"
+          className={({ isActive }) =>
+            `flex items-center text-gray-700 hover:bg-gray-200 p-2 rounded transition-colors duration-200 ${
+              isActive ? activeClassName : ""
+            }`
+          }
+          onClick={onClose}
+        >
+          <i className="bx bx-money-withdraw mr-3 text-xl"></i>
+          <span>Historial de Depositos</span>
+        </NavLink>
+
+        {/* Gestión de Amortización */}
+        <NavLink
+          to="/amortizacion"
+          className={({ isActive }) =>
+            `flex items-center text-gray-700 hover:bg-gray-200 p-2 rounded transition-colors duration-200 ${
+              isActive ? activeClassName : ""
+            }`
+          }
+          onClick={onClose}
+        >
+          <i className="bx bx-money-withdraw mr-3 text-xl"></i>
+          <span>Reporte de Cuotas</span>
+        </NavLink>
+
         {/* Usuarios */}
         <NavLink
           to="/Usuario"
