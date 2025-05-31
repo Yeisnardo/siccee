@@ -4,12 +4,12 @@ import Swal from "sweetalert2";
 import miImagen from "../assets/imagenes/logo_ifemi.jpg";
 import { locationData } from "../components/Venezuela";
 
-// Importa tus servicios API ajustando las rutas y nombres
+// Servicios API
+import personaService from '../services/api_persona';
 import usuarioService from '../services/api_usuario';
-import emprendedorService from '../services/api_emprendedores';
 import ubicacionService from '../services/api_ubicaciones';
+import emprendimientoService from '../services/api_emprendimiento';
 import consejoService from '../services/api_consejoComunal';
-import emprendimientoService from '../services/api_empredimiento';
 
 import "../assets/css/style.css";
 
@@ -43,7 +43,7 @@ const RegistroPasos = () => {
   const [municipios, setMunicipios] = useState([]);
   const [parroquias, setParroquias] = useState([]);
 
-  // Actualiza municipios y parroquias en función del estado seleccionado
+  // Manejar municipios y parroquias
   useEffect(() => {
     if (datos.estado) {
       const estadoActual = locationData.find((e) => e.estado === datos.estado);
@@ -81,77 +81,8 @@ const RegistroPasos = () => {
     }
   };
 
-  // Función para gestionar el proceso de registro completo en el backend
-  const handleRegister = async () => {
-    try {
-      // Crear usuario
-      const nuevoUsuario = {
-        nombre_usuario: datos.nombreUsuario,
-        contrasena: datos.contrasena,
-        estatus: datos.estatus,
-        tipo_usuario: datos.tipoUsuario,
-        foto_rostro: datos.fotoRostro,
-      };
-      const usuarioCreado = await usuarioService.createUsuario(nuevoUsuario);
-
-      // Crear emprendedor
-      const nuevoEmprendedor = {
-        usuario_id: usuarioCreado.id,
-        cedula: datos.cedula,
-        nombre_completo: datos.nombreCompleto,
-        telefono: datos.telefono,
-        email: datos.email,
-      };
-      const emprendedorCreado = await emprendedorService.createEmprendedor(nuevoEmprendedor);
-
-      // Crear ubicación
-      const nuevaUbicacion = {
-        estado: datos.estado,
-        municipio: datos.municipio,
-        parroquia: datos.parroquia,
-        direccion_actual: datos.direccionActual,
-        emprendedor_id: emprendedorCreado.id,
-      };
-      await ubicacionService.createUbicacion(nuevaUbicacion);
-
-      // Crear consejo comunal
-      const nuevoConsejo = {
-        emprendedor_id: emprendedorCreado.id,
-        consejo_nombre: datos.consejoNombre,
-        consejo_direccion: datos.consejoDireccion,
-        comuna: datos.comuna,
-      };
-      await consejoService.createConsejo(nuevoConsejo);
-
-      // Crear emprendimiento
-      const nuevoEmprendimiento = {
-        emprendedor_id: emprendedorCreado.id,
-        sector: datos.sector,
-        tipo_negocio: datos.tipoNegocio,
-        nombre_emprendimiento: datos.nombreEmprendimiento,
-        direccion_emprendimiento: datos.direccionEmprendimiento,
-      };
-      await emprendimientoService.createEmprendimiento(nuevoEmprendimiento);
-
-      Swal.fire({
-        icon: "success",
-        title: "Registro completo",
-        text: "Tus datos han sido registrados correctamente.",
-      });
-      navigate("/");
-
-    } catch (error) {
-      console.error("Error al registrar los datos:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error en el registro",
-        text: "Hubo un problema al guardar los datos. Intenta nuevamente.",
-      });
-    }
-  };
-
   const handleNext = () => {
-    // Validaciones por paso
+    // Validaciones
     if (paso === 1) {
       if (
         !datos.cedula.trim() ||
@@ -227,8 +158,76 @@ const RegistroPasos = () => {
     if (paso > 1) setPaso(paso - 1);
   };
 
-  const handleFinalizar = () => {
-    handleRegister();
+  const handleFinalizar = async () => {
+    try {
+      // 1. Crear persona
+      const nuevaPersona = {
+        cedula: datos.cedula,
+        nombre_completo: datos.nombreCompleto,
+        f_nacimiento: null, // Agrega si tienes la fecha
+        edad: 0, // Calcula si tienes
+        telefono: datos.telefono,
+        email: datos.email,
+        tipo_persona: "Emprendedor",
+      };
+      const personaResp = await personaService.createPersona(nuevaPersona);
+      const personaId = personaResp.id; // Ajusta según respuesta
+
+      // 2. Crear usuario vinculado a persona
+      const nuevoUsuario = {
+        persona_id: personaId,
+        usuario: datos.nombreUsuario,
+        contrasena: datos.contrasena,
+        estatus: datos.estatus,
+        rol: "Emprendedor",
+        foto_rostro: datos.fotoRostro, // convertir a bytes si es necesario
+      };
+      await usuarioService.createUsuario(nuevoUsuario);
+
+      // 3. Crear ubicación vinculada a persona
+      const nuevaUbicacion = {
+        estado: datos.estado,
+        municipio: datos.municipio,
+        parroquia: datos.parroquia,
+        direccion_actual: datos.direccionActual,
+        persona_id: personaId,
+      };
+      await ubicacionService.createUbicacion(nuevaUbicacion);
+
+      // 4. Crear emprendimiento vinculado a persona
+      const nuevoEmprendimiento = {
+        persona_id: personaId,
+        sector: datos.sector,
+        tipo_negocio: datos.tipoNegocio,
+        nombre_emprendimiento: datos.nombreEmprendimiento,
+        direccion_emprendimiento: datos.direccionEmprendimiento,
+      };
+      const emprendimientoResp = await emprendimientoService.createEmprendimiento(nuevoEmprendimiento);
+
+      // 5. Crear consejo comunal vinculado a emprendimiento
+      const nuevoConsejo = {
+        emprendimiento_id: emprendimientoResp.id,
+        consejo_nombre: datos.consejoNombre,
+        consejo_direccion: datos.consejoDireccion,
+        comuna: datos.comuna,
+      };
+      await consejoService.createConsejo(nuevoConsejo);
+
+      Swal.fire({
+        icon: "success",
+        title: "Registro completo",
+        text: "Tus datos han sido registrados correctamente.",
+      });
+      navigate("/");
+
+    } catch (error) {
+      console.error("Error en registro:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error en el registro",
+        text: "Hubo un problema al guardar los datos. Intenta nuevamente.",
+      });
+    }
   };
 
   return (
@@ -283,13 +282,11 @@ const RegistroPasos = () => {
             ))}
           </div>
 
-          {/* Contenido por paso */}
-
           {/* PASO 1: Datos Personales */}
           {paso === 1 && (
             <div>
               <h3 className="text-xl mb-4">Datos Personales</h3>
-              {/* Inputs */}
+              {/* Cedula */}
               <div className="mb-4">
                 <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="cedula">
                   Cédula
@@ -303,6 +300,7 @@ const RegistroPasos = () => {
                   placeholder="Ingresa tu cédula"
                 />
               </div>
+              {/* Nombre completo */}
               <div className="mb-4">
                 <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="nombreCompleto">
                   Nombre Completo
@@ -316,6 +314,7 @@ const RegistroPasos = () => {
                   placeholder="Ingresa tu nombre completo"
                 />
               </div>
+              {/* Teléfono */}
               <div className="mb-4">
                 <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="telefono">
                   Teléfono
@@ -329,6 +328,7 @@ const RegistroPasos = () => {
                   placeholder="Número de teléfono"
                 />
               </div>
+              {/* Email */}
               <div className="mb-4">
                 <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="email">
                   Correo Electrónico
@@ -342,7 +342,7 @@ const RegistroPasos = () => {
                   placeholder="ejemplo@correo.com"
                 />
               </div>
-              {/* Botón Siguiente */}
+              {/* Siguiente */}
               <button
                 onClick={handleNext}
                 className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -355,7 +355,6 @@ const RegistroPasos = () => {
           {/* PASO 2: Dirección */}
           {paso === 2 && (
             <div>
-              <h3 className="text-xl mb-4">Dirección del Emprendedor</h3>
               {/* Estado */}
               <div className="mb-4">
                 <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="estado">
@@ -511,7 +510,7 @@ const RegistroPasos = () => {
             </div>
           )}
 
-          {/* PASO 4: Registro de Emprendimiento */}
+          {/* PASO 4: Emprendimiento */}
           {paso === 4 && (
             <div>
               <h3 className="text-xl mb-4">Registro de Emprendimiento</h3>
@@ -593,7 +592,7 @@ const RegistroPasos = () => {
           {paso === 5 && (
             <div>
               <h3 className="text-xl mb-4">Registro de Usuario</h3>
-              {/* Nombre de Usuario */}
+              {/* Nombre de usuario */}
               <div className="mb-4">
                 <label className="block mb-1 text-sm font-medium text-gray-600" htmlFor="nombreUsuario">
                   Nombre de Usuario

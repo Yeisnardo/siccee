@@ -33,9 +33,9 @@ const Usuario = () => {
     const term = searchTerm.toLowerCase();
     return data.filter(
       (u) =>
-        u.nombre.toLowerCase().includes(term) ||
-        u.email.toLowerCase().includes(term) ||
-        u.rol.toLowerCase().includes(term)
+        u.usuario.toLowerCase().includes(term) ||
+        u.estatus.toLowerCase().includes(term) ||
+        u.tipo_usuario.toLowerCase().includes(term)
     );
   }, [data, searchTerm]);
 
@@ -71,8 +71,8 @@ const handleCreateUser = async () => {
       <input id="nombre" class="swal2-input" placeholder="Nombre y Apellido" />
       <input id="usuario" class="swal2-input" placeholder="Nombre de Usuario" />
       <input id="contrasena" type="password" class="swal2-input" placeholder="Contraseña" />
-      <select id="rol" class="swal2-select">
-        <option value="">Selecciona un rol</option>
+      <select id="tipo_usuario" class="swal2-select">
+        <option value="">Selecciona un tipo_usuario</option>
         <option value="Administrador">Administrador</option>
         <option value="Credito y Cobranza 1">Admin. Credito y Cobranza</option>
         <option value="Credito y Cobranza 2">Asist. Credito y Cobranza</option>
@@ -85,15 +85,15 @@ const handleCreateUser = async () => {
       const nombre = document.getElementById('nombre').value.trim();
       const usuario = document.getElementById('usuario').value.trim();
       const contrasena = document.getElementById('contrasena').value.trim();
-      const rol = document.getElementById('rol').value.trim();
+      const tipo_usuario = document.getElementById('tipo_usuario').value.trim();
 
       if (!cedula) { Swal.showValidationMessage('Por favor, ingrese la cédula de identidad.'); return false; }
       if (!nombre) { Swal.showValidationMessage('Por favor, ingrese el nombre completo.'); return false; }
       if (!usuario) { Swal.showValidationMessage('Por favor, ingrese el nombre de usuario.'); return false; }
       if (contrasena.length < 6) { Swal.showValidationMessage('La contraseña debe tener al menos 6 caracteres.'); return false; }
-      if (!rol) { Swal.showValidationMessage('Por favor, seleccione un rol.'); return false; }
+      if (!tipo_usuario) { Swal.showValidationMessage('Por favor, seleccione un tipo_usuario.'); return false; }
 
-      return { cedula, nombre, usuario, contrasena, rol };
+      return { cedula, nombre, usuario, contrasena, tipo_usuario };
     },
   });
 
@@ -104,7 +104,7 @@ const handleCreateUser = async () => {
       email: `${result.value.usuario}@ejemplo.com`,
       usuario: result.value.usuario,
       contrasena: result.value.contrasena,
-      rol: result.value.rol,
+      tipo_usuario: result.value.tipo_usuario,
       estatus: "Activo",
     };
     try {
@@ -126,12 +126,12 @@ const handleEditUser = async (user) => {
       <input id="nombre" class="swal2-input" placeholder="Nombre y Apellido" value="${user.nombre}" />
       <input id="usuario" class="swal2-input" placeholder="Nombre de Usuario" value="${user.usuario}" />
       <input id="contrasena" type="password" class="swal2-input" placeholder="Dejar en blanco para mantener" />
-      <select id="rol" class="swal2-select">
-        <option value="">Selecciona un rol</option>
-        <option value="Administrador" ${user.rol==="Administrador" ? "selected" : ""}>Administrador</option>
-        <option value="Credito y Cobranza 1" ${user.rol==="Credito y Cobranza 1" ? "selected" : ""}>Admin. Credito y Cobranza</option>
-        <option value="Credito y Cobranza 2" ${user.rol==="Credito y Cobranza 2" ? "selected" : ""}>Asist. Credito y Cobranza</option>
-        <option value="Formalizador" ${user.rol==="Formalizador" ? "selected" : ""}>Formalizador</option>
+      <select id="tipo_usuario" class="swal2-select">
+        <option value="">Selecciona un tipo_usuario</option>
+        <option value="Administrador" ${user.tipo_usuario==="Administrador" ? "selected" : ""}>Administrador</option>
+        <option value="Credito y Cobranza 1" ${user.tipo_usuario==="Credito y Cobranza 1" ? "selected" : ""}>Admin. Credito y Cobranza</option>
+        <option value="Credito y Cobranza 2" ${user.tipo_usuario==="Credito y Cobranza 2" ? "selected" : ""}>Asist. Credito y Cobranza</option>
+        <option value="Formalizador" ${user.tipo_usuario==="Formalizador" ? "selected" : ""}>Formalizador</option>
       </select>
     `,
     focusConfirm: false,
@@ -140,12 +140,12 @@ const handleEditUser = async (user) => {
       const nombre = document.getElementById('nombre').value;
       const usuario = document.getElementById('usuario').value;
       const contrasena = document.getElementById('contrasena').value;
-      const rol = document.getElementById('rol').value;
-      if (!nombre || !usuario || !rol) {
+      const tipo_usuario = document.getElementById('tipo_usuario').value;
+      if (!nombre || !usuario || !tipo_usuario) {
         Swal.showValidationMessage('Por favor, complete todos los campos');
         return false;
       }
-      return { nombre, usuario, contrasena, rol };
+      return { nombre, usuario, contrasena, tipo_usuario };
     },
     
   });
@@ -153,7 +153,7 @@ const handleEditUser = async (user) => {
     const usuarioActualizado = {
       usuario: result.value.usuario,
       password: result.value.contrasena, // puede dejarse vacío
-      rol: result.value.rol,
+      tipo_usuario: result.value.tipo_usuario,
       nombre: result.value.nombre,
     };
     try {
@@ -288,7 +288,7 @@ const handleToggleEstatus = async (user) => {
                     { label: "C.I", key: "cedula" },
                     { label: "Nombre y Apellido", key: "nombre" },
                     { label: "Nombre de Usuario", key: "usuario" },
-                    { label: "Rol", key: "rol" },
+                    { label: "tipo_usuario", key: "tipo_usuario" },
                     { label: "Estatus", key: "estatus" },
                     { label: "Acciones", key: "acciones" },
                   ].map(({ label, key }) => (
@@ -320,7 +320,7 @@ const handleToggleEstatus = async (user) => {
                       <td className="px-4 py-3 text-center text-gray-600">{item.cedula}</td>
                       <td className="px-4 py-3 text-gray-700">{item.nombre}</td>
                       <td className="px-4 py-3 text-gray-700">{item.usuario}</td>
-                      <td className="px-4 py-3 text-gray-700">{item.rol}</td>
+                      <td className="px-4 py-3 text-gray-700">{item.tipo_usuario}</td>
                       <td className="px-4 py-3 text-gray-700">{item.estatus}</td>
                       <td className="px-4 py-3 flex justify-center space-x-3">
                         {/* Botón editar */}

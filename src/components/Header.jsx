@@ -300,7 +300,7 @@ const Header = ({ toggleMenu, menuOpen, user, setUser }) => {
             aria-label="Perfil"
           >
             <i className="bx bxs-user" style={{ fontSize: "24px" }}></i>
-            <span className="hidden sm:inline ml-2">{user?.nombre || "Usuario"}</span>
+            <span className="hidden sm:inline ml-2">{user?.usuario || "Usuario"}</span>
           </button>
 
           {profileMenuOpen && (
