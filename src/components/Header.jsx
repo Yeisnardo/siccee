@@ -264,13 +264,13 @@ const Header = ({ toggleMenu, menuOpen, user, setUser }) => {
           <span className="hidden sm:inline">Emprendimiento</span>
         </button>
         <button
-          className="flex items-center text-white px-3 py-1 rounded hover:bg-gray-700 transition"
-          onClick={() => alert("Ir a Crédito")}
-          title="Crédito"
-        >
-          <i className="bx bx-credit-card mr-2"></i>
-          <span className="hidden sm:inline">Crédito</span>
-        </button>
+  className="flex items-center text-white px-3 py-1 rounded hover:bg-gray-700 transition"
+  onClick={() => navigate('/Credito')} // aquí haces la navegación
+  title="Crédito"
+>
+  <i className="bx bx-credit-card mr-2"></i>
+  <span className="hidden sm:inline">Crédito</span>
+</button>
       </div>
 
       {/* Perfil y notificaciones */}

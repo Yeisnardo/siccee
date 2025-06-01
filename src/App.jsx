@@ -10,6 +10,7 @@ import Gestion from "./pages/Gestion";
 import Aprobacion from "./pages/Aprobacion";
 import Fondo from "./pages/Fondo";
 import Amortizacion from "./pages/Amortizacion";
+import Credito from "./pages/Credito";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -90,6 +91,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Amortizacion />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Credito"
+          element={
+            <ProtectedRoute>
+              <Credito />
             </ProtectedRoute>
           }
         />
