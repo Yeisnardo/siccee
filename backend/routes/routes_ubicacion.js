@@ -1,7 +1,6 @@
-// routes/ubicacionRoutes.js
 const express = require('express');
 const router = express.Router();
-const ubicacionController = require('../controllers/ubicacionController');
+const ubicacionController = require('../controllers/controlador_ubicacion');
 
 router.get('/', ubicacionController.obtenerUbicaciones);
 router.get('/:id', ubicacionController.obtenerUnaUbicacion);

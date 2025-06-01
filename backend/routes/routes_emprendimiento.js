@@ -1,10 +1,9 @@
-// routes/rutas_emprendimiento.js
 const express = require('express');
 const router = express.Router();
 const emprendimientoController = require('../controllers/controlador_emprendimiento');
 
-// Obtener todas los emprendimientos
-router.get('/', emprendimientoController.getEmprendimientos);
+// Obtener todos los emprendimientos
+router.get('/', emprendimientoController.getEmprendimiento);
 
 // Obtener un emprendimiento por ID
 router.get('/:id', emprendimientoController.getUnaEmprendimiento);

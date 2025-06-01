@@ -4,9 +4,9 @@ const cors = require('cors');
 
 // Importar las rutas específicas para cada entidad, excepto 'emprendedores'
 const usuarioRoutes = require('./routes/routes_usuario');
-const emprendimientoRoutes = require('./routes/routes_emprendimientos');
-const ubicacionRoutes = require('./routes/routes_ubicaciones');
-const consejoRoutes = require('./routes/routes_consejo_comunal');
+const emprendimientoRoutes = require('./routes/routes_emprendimiento');
+const ubicacionRoutes = require('./routes/routes_ubicacion');
+const consejoRoutes = require('./routes/routes_consejoComunal');
 const personaRoutes = require('./routes/routes_persona'); // Ruta de persona
 
 // Crear la aplicación Express

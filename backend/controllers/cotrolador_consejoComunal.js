@@ -1,4 +1,3 @@
-// controllers/consejoComunalController.js
 const ConsejoComunal = require('../models/clase_consejo_comunal');
 
 const consejoController = {

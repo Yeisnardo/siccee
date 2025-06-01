@@ -1,4 +1,3 @@
-// models/clase_consejo_comunal.js
 const { query } = require('../config/db');
 
 class ConsejoComunal {
@@ -7,7 +6,7 @@ class ConsejoComunal {
     if (!nombre || !descripcion || !ubicacion_id) {
       throw new Error("Campos obligatorios incompletos");
     }
-    // Validaciones adicionales si deseas
+    // Validaciones adicionales si es necesario
   }
 
   static async getConsejos() {

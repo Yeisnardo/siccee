@@ -1,68 +1,75 @@
-// controllers/ubicacionController.js
+// controllers/controlador_ubicacion.js
+
 const Ubicacion = require('../models/clase_ubicacion');
 
-const ubicacionController = {
-  obtenerUbicaciones: async (req, res) => {
-    try {
-      const ubicaciones = await Ubicacion.getUbicaciones();
-      res.json(ubicaciones);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
-
-  obtenerUnaUbicacion: async (req, res) => {
-    const { id } = req.params;
-    try {
-      const ubicacion = await Ubicacion.getUnaUbicacion(id);
-      if (ubicacion) {
-        res.json(ubicacion);
-      } else {
-        res.status(404).json({ message: 'Ubicación no encontrada' });
-      }
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
-
-  crearUbicacion: async (req, res) => {
-    const data = req.body;
-    try {
-      const nuevaUbicacion = await Ubicacion.createUbicacion(data);
-      res.status(201).json(nuevaUbicacion);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
-
-  actualizarUbicacion: async (req, res) => {
-    const { id } = req.params;
-    const data = req.body;
-    try {
-      const ubicacionActualizada = await Ubicacion.updateUbicacion(id, data);
-      if (ubicacionActualizada) {
-        res.json(ubicacionActualizada);
-      } else {
-        res.status(404).json({ message: 'Ubicación no encontrada' });
-      }
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
-
-  eliminarUbicacion: async (req, res) => {
-    const { id } = req.params;
-    try {
-      const eliminado = await Ubicacion.deleteUbicacion(id);
-      if (eliminado) {
-        res.json({ message: 'Ubicación eliminada' });
-      } else {
-        res.status(404).json({ message: 'Ubicación no encontrada' });
-      }
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
+const obtenerUbicaciones = async (req, res) => {
+  try {
+    const ubicaciones = await Ubicacion.getUbicaciones();
+    res.json(ubicaciones);
+  } catch (err) {
+    console.error('Error en obtenerUbicaciones:', err);
+    res.status(500).json({ error: 'Error al obtener ubicaciones' });
   }
 };
 
-module.exports = ubicacionController;
+const obtenerUnaUbicacion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const ubicacion = await Ubicacion.getUnaUbicacion(id);
+    if (!ubicacion) {
+      return res.status(404).json({ message: 'Ubicación no encontrada' });
+    }
+    res.json(ubicacion);
+  } catch (err) {
+    console.error('Error en obtenerUnaUbicacion:', err);
+    res.status(500).json({ error: 'Error al obtener la ubicación' });
+  }
+};
+
+const crearUbicacion = async (req, res) => {
+  try {
+    const ubicacionData = req.body;
+    const nuevaUbicacion = await Ubicacion.createUbicacion(ubicacionData);
+    res.status(201).json(nuevaUbicacion);
+  } catch (err) {
+    console.error('Error en crearUbicacion:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const actualizarUbicacion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const ubicacionData = req.body;
+    const ubicacionActualizada = await Ubicacion.updateUbicacion(id, ubicacionData);
+    if (!ubicacionActualizada) {
+      return res.status(404).json({ message: 'Ubicación no encontrada' });
+    }
+    res.json(ubicacionActualizada);
+  } catch (err) {
+    console.error('Error en actualizarUbicacion:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const eliminarUbicacion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const ubicacionEliminada = await Ubicacion.deleteUbicacion(id);
+    if (!ubicacionEliminada) {
+      return res.status(404).json({ message: 'Ubicación no encontrada' });
+    }
+    res.json({ message: 'Ubicación eliminada', ubicacion: ubicacionEliminada });
+  } catch (err) {
+    console.error('Error en eliminarUbicacion:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = {
+  obtenerUbicaciones,
+  obtenerUnaUbicacion,
+  crearUbicacion,
+  actualizarUbicacion,
+  eliminarUbicacion
+};

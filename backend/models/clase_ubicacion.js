@@ -1,4 +1,3 @@
-// models/clase_ubicacion.js
 const { query } = require('../config/db');
 
 class Ubicacion {
@@ -7,7 +6,7 @@ class Ubicacion {
     if (!nombre || !direccion || !ciudad || !pais) {
       throw new Error("Campos obligatorios incompletos");
     }
-    // Validaciones adicionales si deseas
+    // Validaciones adicionales si lo deseas
   }
 
   static async getUbicaciones() {

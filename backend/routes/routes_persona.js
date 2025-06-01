@@ -3,6 +3,8 @@ const express = require('express');
 const router = express.Router();
 const personaController = require('../controllers/controlador_persona');
 
+// Rutas de CRUD para la entidad Persona
+
 // Obtener todas las personas
 router.get('/', personaController.getPersona);
 

@@ -8,7 +8,7 @@ class Persona {
     if (!cedula || !nombre_completo || edad == null || !tipo_persona) {
       throw new Error("Campos obligatorios incompletos");
     }
-    // Puedes agregar validaciones adicionales si lo deseas
+    // Validaciones adicionales pueden agregarse aquí
   }
 
   // Obtener todas las personas
@@ -37,7 +37,8 @@ class Persona {
     } = personaData;
 
     const resultado = await query(
-      `INSERT INTO persona (cedula, nombre_completo, f_nacimiento, edad, telefono, email, tipo_persona)
+      `INSERT INTO persona 
+        (cedula, nombre_completo, f_nacimiento, edad, telefono, email, tipo_persona)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
       [cedula, nombre_completo, f_nacimiento, edad, telefono, email, tipo_persona]
